@@ -1,61 +1,69 @@
-# 易宝支付接入技能
+# 易宝支付接入技能 v0.4
 
-本项目用于在智能编程工具中，辅助开发者完成易宝支付接入与联调排障。
+面向 Agent 的易宝支付（Yeepay）接入与联调排障技能。覆盖**收单 / 退款 / 分账 / 出款 / 对账**全业务域，
+内置签名验签、回调验签、幂等重试、查单纪律，并提供产品决策、场景流程、工具脚本与代码示例。
 
-## 定位与边界
+## 设计原则
 
-- 本技能是接入知识与流程规则集合，不是支付网关或生产交易通道。
-- 生产交易调用以易宝标准开放接口为准。
-- 代码编写能力来自智能编程工具平台，本技能负责提供规范、路径和约束。
+- **单一入口**：唯一 `SKILL.md` 负责路由与纪律，不再有多个子技能 `SKILL.md`。
+- **API 走在线**：接口字段/错误码不内置静态文档，统一由 `references/产品能力/api-index.yaml`
+  维护 `doc_md` 在线文档链接，Agent 按「文档加载协议」用 `curl` 实时拉取，保证字段永远最新。
+- **产品能力维度组织**：业务文档按「产品能力 / 业务域 / 场景」展开，每个场景一个 md，
+  只写流程、易错点与引用（API 走 catalog、代码走示例代码、规则走平台文档）。
+- **平台文档本地权威**：签名、加密、回调机制、接入准备、错误码等稳定规则本地保留，不走 curl。
 
-## 当前版本覆盖范围
-
-- 收单：APP支付、小程序支付、浏览器页面支付、微信内 H5+公众号支付、主扫支付、被扫支付
-- 退款：退款申请、退款查询
-- 分账：订单分账、余额分账
-- 出款：结算、提现
-- 对账：交易、分账、资金、结算对账
-
-## 版本与更新说明
-
-- 当前版本号见根目录文件 `VERSION`（当前为 `0.2.0`）。
-- 建议采用语义化版本：
-  - `MAJOR`：目录结构或使用方式发生不兼容变化
-  - `MINOR`：新增业务能力、接口文档或规则
-  - `PATCH`：文案修正、链接修复、排障提示优化等兼容性修改
-
-## 使用方式
-
-1. 先读 `yeepay-shared-base/SKILL.md` 及其 `references`。
-   - 无 SDK 对接场景可优先阅读 `yeepay-shared-base/references/no-sdk-integration-rsa.md`。
-2. 按业务域进入对应目录，从 `references/api-index.md` 开始。
-3. 需要排障时使用 `yeepay-ops/references` 文档。
-4. 上线前执行 `yeepay-ops/references/go-live-checklist.md`。
-
-## 目录概览
+## 目录结构
 
 ```text
-yeepay-shared-base/            # 共享规则：签名、回调、幂等、错误码
-yeepay-acquiring/              # 收单
-yeepay-refund/                 # 退款
-yeepay-profit-sharing/         # 分账
-yeepay-payout/                 # 出款
-yeepay-reconciliation/         # 对账
-yeepay-ops/                    # 运维保障
+yeepay-pay-skill-v0.4/
+├── README.md                         本文件
+├── LICENSE.md
+├── SKILL.md                          唯一入口：路由 + 纪律 + 文档加载协议
+├── scripts/                          Python 工具
+│   ├── gen_keypair.py                生成密钥对（RSA/SM2）
+│   ├── query_order.py                查单
+│   ├── refund.py                     退款
+│   └── mock_notify.py                本地模拟发结果通知
+└── references/
+    ├── 平台文档/                      本地权威（接入准备/安全认证/平台规范/工具与支持/错误码）
+    ├── 产品能力/
+    │   ├── 产品决策.md                方案与支付方式选型决策
+    │   ├── api-index.yaml            所有 API 的 curl 清单
+    │   ├── 收单/                      8 个支付场景
+    │   ├── 退款/退款.md
+    │   ├── 分账/                      订单分账 / 余额分账
+    │   ├── 出款/                      结算 / 提现
+    │   └── 对账/                      交易 / 分账 / 资金 / 结算对账
+    ├── 示例代码/                      加验签/加解密/接收回调/前端（占位）
+    └── troubleshooting.md            各业务域排障汇总
 ```
 
-## 关键规则
+## 接口数据源（实测确认）
 
-- 涉及状态变更的操作（如支付、退款、分账、提现）应先确认环境与关键参数。
-- 支付结果以后端查单或回调确认为准，不以前端页面展示为准。
-- 禁止输出密钥、私钥及完整敏感标识。
+接口规格由开放平台「在线 markdown 文档」提供，产品无关，可直接 `curl`：
 
-## 当前限制
+| 用途 | URL 模板 |
+|------|----------|
+| 接口在线文档（基本信息/请求参数/请求示例/响应参数/响应示例/错误码/示例代码，单文件全含） | `https://open.yeepay.com/docs-v3/api/<slug>.md` |
+| 结果通知（SPI）文档 | `https://open.yeepay.com/docs-v3/notify/<spi>.md` |
 
-- 当前版本不覆盖全部开放接口。
-- 生成代码仍需开发者结合项目结构完成适配与验证。
+> slug 规则：`<method小写>_<path去掉开头/，/ 换 _>`（保留 `.` 与 `-`）。
+> 例：`POST /rest/v2.0/aggpay/wechat-config/add` → `post_rest_v2.0_aggpay_wechat-config_add`。
+> 例外：个别接口（如 yos 账单下载类）前缀为 `options_`，以 `api-index.yaml` 中实测的 `doc_md` 为准。
+>
+> 人类页 `https://open.yeepay.com/docs/products/<product>/api/<uri>` 是 SPA，curl 取不到字段，仅作链接。
 
-## 许可证
+## 相对 v0.3-draft 的变化
 
-专有许可证（保留所有权利）。详见 `LICENSE.md`。
+1. 业务文档由 `domains/<域>.md` 单文件，展开为 `references/产品能力/<域>/<场景>.md`（收单拆为 8 个场景）。
+2. 新增 `references/产品能力/产品决策.md`（方案/支付方式选型决策）。
+3. `shared-base/originals/开发文档` 全量迁入 `references/平台文档/`。
+4. 新增 `scripts/` Python 工具（密钥/查单/退款/模拟回调）。
+5. 新增 `references/示例代码/`（加验签/加解密/接收回调/前端，本版占位）。
+6. `api-catalog.yaml` 改名为 `references/产品能力/api-index.yaml`。
 
+## 使用约定
+
+- 任何 API 字段实现前必须走 `curl`，不得凭记忆编造字段。
+- `scripts/` 仅用于联调与本地验证，不用于生产出款/交易。
+- 上线前对照 `references/troubleshooting.md` 的上线检查清单逐项确认。

@@ -1,0 +1,4 @@
+cryptography>=42.0.0
+requests>=2.31.0
+# SM2 密钥生成可选依赖（严格国密建议用 tongsuo/gmssl 命令行）
+gmssl>=3.2.1
