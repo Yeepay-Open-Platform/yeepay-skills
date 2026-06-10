@@ -43,7 +43,6 @@ public String parse(HttpServletRequest req) throws IOException {
     // 根据请求头、请求体，进行验签认证、解密等后续操作
 }
 
-
 // 获取请求头
 private Map&lt;String, String&gt; getHeaders(HttpServletRequest request) {
     Map&lt;String, String&gt; result = Maps.newHashMap();
@@ -168,7 +167,7 @@ byte[] key = sm2Decrypt(priKey,decodeBase64(cipherKey));
 
 **注意**：
 
--   平台BASE64编码采用的URL安全模式(将非法字符'+'和'/'转为'-'和'\_', 见RFC3548)，部分语言解码时须先进行手动替换还原，伪代码示例：`$data.replaceAll("-", "+").replaceAll("_", "/")`
+-   平台BASE64编码采用的URL安全模式(将非法字符'+'和'/'转为'-'和'_', 见RFC3548)，部分语言解码时须先进行手动替换还原，伪代码示例：`$data.replaceAll("-", "+").replaceAll("_", "/")`
 
 ##### [](https://open.yeepay.com/docs-v3/platform/14023.md#2.%E4%BD%BF%E7%94%A8%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E5%AF%86%E9%92%A5%E8%A7%A3%E5%AF%86%E8%8E%B7%E5%BE%97%E6%95%B0%E6%8D%AE%E6%98%8E%E6%96%87)2.使用对称加密密钥解密获得数据明文
 

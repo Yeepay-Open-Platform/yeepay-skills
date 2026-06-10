@@ -24,7 +24,7 @@
 | 参数名 | 类型 | 说明 | 示例 |
 | --- | --- | --- | --- |
 | response | string | 加密签名后的业务数据 | ZIcrArl... |
-| customerIdentification | string | 应用标识(appKey) | app\_100xxxxxxxx |
+| customerIdentification | string | 应用标识(appKey) | app_100xxxxxxxx |
 
 ### [](https://open.yeepay.com/docs-v3/platform/207.md#%E6%8A%A5%E6%96%87%E7%BB%93%E6%9E%84)报文结构
 
@@ -62,7 +62,6 @@ public void parse(HttpServletRequest req) throws IOException {
 // 引入工具类
 import com.yeepay.yop.sdk.utils.DigitalEnvelopeUtils;
 import com.yeepay.yop.sdk.inter.utils.RSAKeyUtils;
-
 
 String response = "lVBazeHF7PSSpI7p5BAd6Z4kVZbr_LCP5lT72GA_UQMRHLSx6oa1pK8oFTPMb9Ns3_FyX2smaRW0J13RKithQRvKvKpD3pbmvvkuOfIU9ak2MAwHoTeG_VqCb8NSw-NPDAJKn_GPH4WF5RDx0EMzDzoQ8krOzB3naBZpCqhWmnZqZ-GvyC_NaAuFdBQYSs5LIKkGHwPm7Hsprgpb4uRdnSL0_G7BagRFSe-HS3gbSwJhGxrmI59jsCaiGlW7TfN3FSpL-7C76sW6WjtCotguKZOf9ZgXbLMH0VRUgul5PwALiNEuUmFHebu5RtQONkRvlKlb7haMS6ryL46kradL3Q$_ZhicudE6S4GsolpCyDNVFDqG1IGf2SnwwFW7JeNQChdfSh_qaR88xlk9Adq2YHdV7LStPAJcZE8-z7iFjMOW8QUIXwhA4S_8Q5KW07xT2P1CcTwMBOjYUVM2w6Wls3dNKR3TN5Z06ruoR2ZQdshL579CRIb1ZhjpJPYwei75IMb2L3qPTflEPAGoocijf3W3-A2pbxLTzsG-lt5iJRgFXPkdtJd21XioEhapPyckXyu4Czaj8ByuxWgmTAcwwW-pED0QN0l3INAo1XbwvgIuZqvHE8uM2K2uCUL_dK_196BbhyL-jmdeQ5ZKMEvTP3KIt55GAEkp7sdbbnPtBPnyC5MJpLA8_Qy38wIxV2A8z31rSlx7po0xptjTlub9O4K4OgNjyfSD3XbNiR8Ns5zgK-ii0eHEIZsc-wO20byFmTy031NeONuH2gwtVRgv_vyeoaj5g96o4UOjW3nvmnI5X5_yABm_R2cgwGLTpLL9ouibuWw1-Z-8mY22wt3whrp2ZapYc7ZZ60UXEP4ly_uOg$AES$SHA256";
 String privateKeyStr = "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCtIAOnUbibis2X4rHeM8Kdij11d1Mr+WmOBc5qsBLXtDMGs0D2r/wcqZe9WttShbSoYWOqmD6uGhUrWIsYrag7mYdlI+KT6thhcGmLxM+5IFdYXhIFIYySRBstWti8H5knGs7KuWMkWWzjH/Su21AWYx9R4mSoG1JlAuPeAePrx248NmOhD45FNaRuYTf++Ecmjmbbyo+Ch285N2M3SSXHbbYhsrNpDSWDVfQfFZ4RTTWceLwwuvGJCY8hT+JiK30CN5qa02wYl56l2HeK+zHBBGS6DBUm+qzOoE+eAizLHvKTySExhH8VZa5F2t9T1RPeRlYbCD62VMceuqqRuAD/AgMBAAECggEBAJb+/TDKDgFbpsV6azgqXOuazs/NKzWHa5D7b3WN7GFGQdruLRL7myBEqpv0yqXHCDJz/sGj18dx6FTN/UOg8sJIvdZw3gW1JtSVfvjwx1vn4UaphX4ELN7FmA6O1cn+pU1+DC60Usw5Uscl7/syPT/JZF++3ZvheJOxWZ0gePICopz1grychDlLPk5sVA6rttCJxkTFAEnFFB6qxSsa7hJl3rb6iziVtpUGot1M0kMr1vm+EXx4hh+UJ+xcE1mGy26xw4tsWA8Kla2nUlzQiNqNSnzEcravnB2XqLr53z3axJOYp4hz5QyH1LiNgAiRQNdyM3fhjlQwkTLCjnAJPAECgYEA+UpZ3DTrpdG4uR2HksuEaI7czGr/oXbkxH2sWKPkUovxjPNwQjNpxg9+xNlP33kvMjXFETSGZDEJKk5awTkyKP3lvHQN63jlLv9EV+eZR0XQCYRPGoC5js49M/Lh8qjG5yRjPp5igSLrm7ZBEwpjXZI7hhKi2A0lXhH/Kz/Gaz8CgYEAscjfSgmTzIzJKmdW0lUY6QkgZIYrCX8EdFO3Bb+SJNPZYjL7vcM7L2SpUt6DkeEcI/sVgM2CwXmQNvXWWn9ibdM/DCIK41qkZ9/rOXPcI9R/03GT681Va3oVCyzaGWxbsDigoYoo/WhnppHiRydvvDSq/f4OBYCGIPtyJkXVukECgYBun1nE6A7x5GDOdJYmw/0b0NmWNJz/b50QvJvwMbouDz+/Rn+4QMxdQZ8Fh1F0X3hcFZQ/kElayI/CoEaRm+nwWsrJl85dgaZh9pDDWVihUg+BSZ84qYquHkL2fH9biR3KkFEiBnK7z10yGexCoMd7TFrxoe91ZFACsIXFEWXhTQKBgFogw1H9WPgxxynACbvHeEFrZwiPG/JMei2e4wH/BE+3NlUaE5U4DCESnuRr+bdSr7lt6JDLnqYGwp2aM3jda0DR/vxfpbVsljwywET3/3oKmGLRCXRZPByoX1KzAj4xOKo1ivlZ2T3eV+2Rt2zrCTIYYTcyPFl9toGx90R/0sIBAoGBAOHc1x61ofaUPKQvY40A54VOuKTLDKcsHmlZ+mKWasFKSykQJ76Np42ctlZ+ucUjT66jPD4/kr7kwqPfOco9FOSOhqG3l+0qJnE8lo8+UEbuVA4ZWdflI1mdUzPFs1r0f3N1YasMRM5cBJUEGm8SjoUshKLLKOwTakGvnmoJpLpu";
@@ -183,7 +182,7 @@ function rsa_callback(){
 **注意**：
 
 -   通知明文中可能存在 `$`符号，但是签名部分中没有 `$`符号, 所以首先应该定位到最后一个 `$`符号的位置，其前为通知明文，其后为签名
--   平台BASE64编码采用的URL安全模式(将非法字符'+'和'/'转为'-'和'\_', 见RFC3548)，部分语言解码时须先进行手动替换还原，伪代码示例：`$data.replaceAll("-", "+").replaceAll("_", "/")`
+-   平台BASE64编码采用的URL安全模式(将非法字符'+'和'/'转为'-'和'_', 见RFC3548)，部分语言解码时须先进行手动替换还原，伪代码示例：`$data.replaceAll("-", "+").replaceAll("_", "/")`
 
 ## [](https://open.yeepay.com/docs-v3/platform/207.md#%E5%93%8D%E5%BA%94%E8%A7%84%E8%8C%83)响应规范
 

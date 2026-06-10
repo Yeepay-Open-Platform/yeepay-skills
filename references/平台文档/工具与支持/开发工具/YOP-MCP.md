@@ -1,4 +1,3 @@
-# YOP-MCP
 
 # YOP MCP 开发者快速入门指南
 

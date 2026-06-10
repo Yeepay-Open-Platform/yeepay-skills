@@ -26,7 +26,7 @@ YOP支持的安全需求`securityReq`：
 
 ### [](https://open.yeepay.com/docs-v3/platform/14025.md#2%E3%80%81%E8%AE%A4%E8%AF%81%E5%AD%97%E7%AC%A6%E4%B8%B2authstring)2、认证字符串authString
 
-<span id="test2">认证字符串authString</span>，由协议版本`protocolVersion`、应用标识`appKey`、日期值`timestamp`和签名有效时长`expiredSeconds`组成。 确保 YOP 平台在收到请求时能使用相同的签名协议并匹配您计算出的签名且在有效期内。否则，您的请求将被拒绝。
+认证字符串authString，由协议版本`protocolVersion`、应用标识`appKey`、日期值`timestamp`和签名有效时长`expiredSeconds`组成。 确保 YOP 平台在收到请求时能使用相同的签名协议并匹配您计算出的签名且在有效期内。否则，您的请求将被拒绝。
 
 ```
 authString: protocolVersion/appKey/timestamp/expiredSeconds
