@@ -130,6 +130,19 @@ profit-sharing:
     path: /rest/v1.0/divide/back/query
     api_id: b2735a9f8a9a4bcda4feb1b0cf777d73
     doc_md: https://open.yeepay.com/docs-v3/api/get_rest_v1.0_divide_back_query.md
+  - id: mer-receiver-apply
+    name: 申请入账方
+    method: POST
+    path: /rest/v1.0/mer/receiver/apply
+    api_id: 0a63ae3781934d14af7a6f6497b8836d
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_mer_receiver_apply.md
+    notify_spi: mer.receiver-apply-receiver-notify
+  - id: mer-receiver-apply-progress-query
+    name: 入账方申请进度查询
+    method: POST
+    path: /rest/v1.0/mer/receiver/apply-progress-query
+    api_id: aea0087462694570a537e81f887bdae2
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_mer_receiver_apply-progress-query.md
   - id: divide-balance-apply
     name: 申请余额分账
     method: POST
