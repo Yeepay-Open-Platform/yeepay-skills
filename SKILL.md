@@ -271,9 +271,13 @@ doc_md「示例代码」节为**自动生成的全参数模板**（含脏占位�
 
 ```text
 SKILL.md                       本文件，唯一入口（面客纪律 + 技术执行）
-scripts/                       Python 联调工具（密钥/查单/退款/回调 mock 与解密）
+scripts/                       Python 联调工具 + validate_docs.py 文档质量守门
 references/
-  平台文档/                    本地权威：接入准备/安全认证/平台规范/SDK/错误码
+  平台文档/                    本地权威（约 30 篇，索引见 platform-doc-manifest.yaml）
+    接入准备/                  快速接入、应用管理、密钥管理(CFCA/RSA/SM)
+    开始对接/                  SDK使用说明、沙箱、IP白名单、平台错误码、Java-SDK报错
+    平台规范/                  上线检查、回调网络配置、结果通知机制/查询重发、安全认证
+    工具与支持/                平台SDK、密钥工具、接入诊断、YOP-MCP、常见问题
   产品能力/
     产品决策.md                选型、关键词、澄清模板、超范围回复
     api-index.yaml             API curl 清单（doc_md / path / method / api_id）

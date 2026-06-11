@@ -18,7 +18,8 @@ pip install -r requirements.txt
 | `refund.py` | 退款申请/查询 | doc_md + api-index.yaml |
 | `mock_notify.py` | 模拟发结果通知 | `结果通知(RSA).md`、`回调解密协议.md` |
 | `decrypt_notify.py` | 回调密文解密验签 | `回调解密协议.md` |
-| `notify_crypto.py` | 四段密文编解码（内部模块） | `YopRsaCallbackExample.java` |
+| `notify_crypto.py` | 四段密文编解码（内部模块） | `回调解密协议.md` |
+| `validate_docs.py` | 平台文档质量守门（H1/CSS/表格/截图密度） | `references/平台文档/` |
 
 ## mock_notify 两种模式
 
@@ -57,6 +58,13 @@ python mock_notify.py --mode real --dry-run \
 python decrypt_notify.py --cipher "$(tail -1 /tmp/cipher.txt)" \
   --merchant-key ./keys/rsa_private_pkcs8.pem \
   --yop-pubkey ./keys/rsa_public.pem
+```
+
+## 文档质量校验
+
+```bash
+python validate_docs.py
+python validate_docs.py --with-notify-test   # 含 mock/decrypt 互打
 ```
 
 ## 重要约定

@@ -54,72 +54,16 @@ public void parse(HttpServletRequest req) throws IOException {
 
 ## [](https://open.yeepay.com/docs-v3/platform/207.md#%E8%AE%A4%E8%AF%81%E8%A7%A3%E5%AF%86)认证解密
 
-### [](https://open.yeepay.com/docs-v3/platform/207.md#%E6%96%B9%E6%A1%88%E4%B8%80%EF%BC%9A%E4%BD%BF%E7%94%A8-sdk%EF%BC%88%E6%8E%A8%E8%8D%90%EF%BC%89)方案一：使用 SDK（推荐）
+### 方案一：使用 SDK（推荐）
 
-#### [](https://open.yeepay.com/docs-v3/platform/207.md#java-sdk-%E7%A4%BA%E4%BE%8B)Java SDK 示例
+| 语言 | 文档 |
+| --- | --- |
+| Java | `开始对接/SDK使用说明.md` §六（`DigitalEnvelopeUtils` / `YopCallbackEngine`） |
+| 其他 | `工具与支持/开发工具/平台SDK.md` 定位仓库 README |
 
-```
-// 引入工具类
-import com.yeepay.yop.sdk.utils.DigitalEnvelopeUtils;
-import com.yeepay.yop.sdk.inter.utils.RSAKeyUtils;
+### 方案二：使用事件网关
 
-String response = "lVBazeHF7PSSpI7p5BAd6Z4kVZbr_LCP5lT72GA_UQMRHLSx6oa1pK8oFTPMb9Ns3_FyX2smaRW0J13RKithQRvKvKpD3pbmvvkuOfIU9ak2MAwHoTeG_VqCb8NSw-NPDAJKn_GPH4WF5RDx0EMzDzoQ8krOzB3naBZpCqhWmnZqZ-GvyC_NaAuFdBQYSs5LIKkGHwPm7Hsprgpb4uRdnSL0_G7BagRFSe-HS3gbSwJhGxrmI59jsCaiGlW7TfN3FSpL-7C76sW6WjtCotguKZOf9ZgXbLMH0VRUgul5PwALiNEuUmFHebu5RtQONkRvlKlb7haMS6ryL46kradL3Q$_ZhicudE6S4GsolpCyDNVFDqG1IGf2SnwwFW7JeNQChdfSh_qaR88xlk9Adq2YHdV7LStPAJcZE8-z7iFjMOW8QUIXwhA4S_8Q5KW07xT2P1CcTwMBOjYUVM2w6Wls3dNKR3TN5Z06ruoR2ZQdshL579CRIb1ZhjpJPYwei75IMb2L3qPTflEPAGoocijf3W3-A2pbxLTzsG-lt5iJRgFXPkdtJd21XioEhapPyckXyu4Czaj8ByuxWgmTAcwwW-pED0QN0l3INAo1XbwvgIuZqvHE8uM2K2uCUL_dK_196BbhyL-jmdeQ5ZKMEvTP3KIt55GAEkp7sdbbnPtBPnyC5MJpLA8_Qy38wIxV2A8z31rSlx7po0xptjTlub9O4K4OgNjyfSD3XbNiR8Ns5zgK-ii0eHEIZsc-wO20byFmTy031NeONuH2gwtVRgv_vyeoaj5g96o4UOjW3nvmnI5X5_yABm_R2cgwGLTpLL9ouibuWw1-Z-8mY22wt3whrp2ZapYc7ZZ60UXEP4ly_uOg$AES$SHA256";
-String privateKeyStr = "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCtIAOnUbibis2X4rHeM8Kdij11d1Mr+WmOBc5qsBLXtDMGs0D2r/wcqZe9WttShbSoYWOqmD6uGhUrWIsYrag7mYdlI+KT6thhcGmLxM+5IFdYXhIFIYySRBstWti8H5knGs7KuWMkWWzjH/Su21AWYx9R4mSoG1JlAuPeAePrx248NmOhD45FNaRuYTf++Ecmjmbbyo+Ch285N2M3SSXHbbYhsrNpDSWDVfQfFZ4RTTWceLwwuvGJCY8hT+JiK30CN5qa02wYl56l2HeK+zHBBGS6DBUm+qzOoE+eAizLHvKTySExhH8VZa5F2t9T1RPeRlYbCD62VMceuqqRuAD/AgMBAAECggEBAJb+/TDKDgFbpsV6azgqXOuazs/NKzWHa5D7b3WN7GFGQdruLRL7myBEqpv0yqXHCDJz/sGj18dx6FTN/UOg8sJIvdZw3gW1JtSVfvjwx1vn4UaphX4ELN7FmA6O1cn+pU1+DC60Usw5Uscl7/syPT/JZF++3ZvheJOxWZ0gePICopz1grychDlLPk5sVA6rttCJxkTFAEnFFB6qxSsa7hJl3rb6iziVtpUGot1M0kMr1vm+EXx4hh+UJ+xcE1mGy26xw4tsWA8Kla2nUlzQiNqNSnzEcravnB2XqLr53z3axJOYp4hz5QyH1LiNgAiRQNdyM3fhjlQwkTLCjnAJPAECgYEA+UpZ3DTrpdG4uR2HksuEaI7czGr/oXbkxH2sWKPkUovxjPNwQjNpxg9+xNlP33kvMjXFETSGZDEJKk5awTkyKP3lvHQN63jlLv9EV+eZR0XQCYRPGoC5js49M/Lh8qjG5yRjPp5igSLrm7ZBEwpjXZI7hhKi2A0lXhH/Kz/Gaz8CgYEAscjfSgmTzIzJKmdW0lUY6QkgZIYrCX8EdFO3Bb+SJNPZYjL7vcM7L2SpUt6DkeEcI/sVgM2CwXmQNvXWWn9ibdM/DCIK41qkZ9/rOXPcI9R/03GT681Va3oVCyzaGWxbsDigoYoo/WhnppHiRydvvDSq/f4OBYCGIPtyJkXVukECgYBun1nE6A7x5GDOdJYmw/0b0NmWNJz/b50QvJvwMbouDz+/Rn+4QMxdQZ8Fh1F0X3hcFZQ/kElayI/CoEaRm+nwWsrJl85dgaZh9pDDWVihUg+BSZ84qYquHkL2fH9biR3KkFEiBnK7z10yGexCoMd7TFrxoe91ZFACsIXFEWXhTQKBgFogw1H9WPgxxynACbvHeEFrZwiPG/JMei2e4wH/BE+3NlUaE5U4DCESnuRr+bdSr7lt6JDLnqYGwp2aM3jda0DR/vxfpbVsljwywET3/3oKmGLRCXRZPByoX1KzAj4xOKo1ivlZ2T3eV+2Rt2zrCTIYYTcyPFl9toGx90R/0sIBAoGBAOHc1x61ofaUPKQvY40A54VOuKTLDKcsHmlZ+mKWasFKSykQJ76Np42ctlZ+ucUjT66jPD4/kr7kwqPfOco9FOSOhqG3l+0qJnE8lo8+UEbuVA4ZWdflI1mdUzPFs1r0f3N1YasMRM5cBJUEGm8SjoUshKLLKOwTakGvnmoJpLpu";
-String appKey = "app_100276759800045";
-PrivateKey isvPrivateKey = RSAKeyUtils.string2PrivateKey(privateKeyStr);
-
-// 根据自身情况从下列三种方式中选择其一
-// 解密方法1：走程序配置的默认appKey，默认私钥
-String plaintText = DigitalEnvelopeUtils.decrypt(response, "RSA2048");
-
-// 解密方法2：走指定appKey配置的私钥
-String plaintTextWithAppKey = DigitalEnvelopeUtils.decrypt(
-    response, appKey, "RSA2048"
-);
-
-// 解密方法3：走指定私钥
-String plaintTextWithPrivateKey = DigitalEnvelopeUtils.decrypt(
-    response, isvPrivateKey
-);
-```
-
-#### [](https://open.yeepay.com/docs-v3/platform/207.md#php-sdk-%E7%A4%BA%E4%BE%8B)PHP SDK 示例
-
-```
-// 引入工具类
-use Yeepay\Yop\Sdk\V1\Util\YopSignUtils;
-
-/**
- * @test rsa回调解密
- */
-function rsa_callback(){
-    //返回的密文
-    $source='xxx';
-    /*商户私钥*/
-    $private_Key='xxx';
-    /*YOP公钥*/
- $yop_public_Key='MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6p0XWjscY+gsyqKRhw9MeLsEmhFdBRhT2emOck/F1Omw38ZWhJxh9kDfs5HzFJMrVozgU+SJFDONxs8UB0wMILKRmqfLcfClG9MyCNuJkkfm0HFQv1hRGdOvZPXj3Bckuwa7FrEXBRYUhK7vJ40afumspthmse6bs6mZxNn/mALZ2X07uznOrrc2rk41Y2HftduxZw6T4EmtWuN2x4CZ8gwSyPAW5ZzZJLQ6tZDojBK4GZTAGhnn3bg5bBsBlw2+FLkCQBuDsJVsFPiGh/b6K/+zGTvWyUcu+LUj2MejYQELDO3i2vQXVDk7lVi2/TcUYefvIcssnzsfCfjaorxsuwIDAQAB';
-    //还原出原文
-    $response = YopSignUtils::decrypt($source, $private_Key, $yop_public_Key);
-
-    print_r($response);
-}
-```
-
-##### [](https://open.yeepay.com/docs-v3/platform/207.md#%E7%9B%B8%E5%85%B3%E5%B7%A5%E5%85%B7%E7%B1%BB)相关工具类
-
-其中`YopSignUtils`请查看[源码](https://github.com/yop-platform/yop-php-sdk/blob/main/src/Util/YopSignUtils.php)
-
-#### [](https://open.yeepay.com/docs-v3/platform/207.md#%E4%BC%98%E5%8A%BF)优势
-
--   封装了复杂的加解密逻辑
--   自动处理密钥管理
--   持续更新和维护
--   经过充分测试验证
-
-### [](https://open.yeepay.com/docs-v3/platform/207.md#%E6%96%B9%E6%A1%88%E4%BA%8C%EF%BC%9A%E4%BD%BF%E7%94%A8%E4%BA%8B%E4%BB%B6%E7%BD%91%E5%85%B3)方案二：使用事件网关
-
-参考 [商户通知快速对接网关](https://open.yeepay.com/docs-v3/platform/2238.md) 实现。
+见 `工具与支持/开发工具/结果通知工具.md`。
 
 ### [](https://open.yeepay.com/docs-v3/platform/207.md#%E6%96%B9%E6%A1%88%E4%B8%89%EF%BC%9A%E8%87%AA%E8%A1%8C%E5%AE%9E%E7%8E%B0)方案三：自行实现
 
@@ -184,57 +128,12 @@ function rsa_callback(){
 -   通知明文中可能存在 `$`符号，但是签名部分中没有 `$`符号, 所以首先应该定位到最后一个 `$`符号的位置，其前为通知明文，其后为签名
 -   平台BASE64编码采用的URL安全模式(将非法字符'+'和'/'转为'-'和'_', 见RFC3548)，部分语言解码时须先进行手动替换还原，伪代码示例：`$data.replaceAll("-", "+").replaceAll("_", "/")`
 
-## [](https://open.yeepay.com/docs-v3/platform/207.md#%E5%93%8D%E5%BA%94%E8%A7%84%E8%8C%83)响应规范
+## 响应规范
 
-### [](https://open.yeepay.com/docs-v3/platform/207.md#%E6%88%90%E5%8A%9F%E5%93%8D%E5%BA%94)成功响应
+成功/失败应答、重试与幂等见 `结果通知机制说明.md` §三–§四。RSA 成功应答：HTTP 200 + 纯文本 `SUCCESS`。
 
--   HTTP状态码：200
--   响应内容：SUCCESS
--   格式要求：纯文本，无需加密签名
+## 通用机制与排障
 
-### [](https://open.yeepay.com/docs-v3/platform/207.md#%E5%A4%B1%E8%B4%A5%E5%93%8D%E5%BA%94)失败响应
+notifyUrl、重试策略、幂等、查单兜底、成功应答格式等见 `平台规范/结果通知机制说明.md`。
 
--   HTTP状态码：4xx 或 500
--   响应内容：自定义错误信息
--   用途：用于通知重试判断
-
-## [](https://open.yeepay.com/docs-v3/platform/207.md#%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5)最佳实践
-
-### [](https://open.yeepay.com/docs-v3/platform/207.md#%E5%AE%9E%E7%8E%B0%E5%BB%BA%E8%AE%AE)实现建议
-
-1.  优先使用官方SDK
-2.  做好异常处理
-3.  实现幂等性控制
-4.  记录详细日志
-5.  设置合理超时
-
-### [](https://open.yeepay.com/docs-v3/platform/207.md#%E5%AE%89%E5%85%A8%E5%BB%BA%E8%AE%AE)安全建议
-
-1.  妥善保管私钥
-2.  验证每次签名
-3.  检查通知来源
-4.  加密敏感数据
-
-### [](https://open.yeepay.com/docs-v3/platform/207.md#%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96)性能优化
-
-1.  使用线程池
-2.  异步处理通知
-3.  合理设置超时
-4.  做好限流保护
-
-## [](https://open.yeepay.com/docs-v3/platform/207.md#%E6%95%85%E9%9A%9C%E6%8E%92%E9%99%A4)故障排除
-
-### [](https://open.yeepay.com/docs-v3/platform/207.md#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)常见问题
-
-1.  签名验证失败
-    -   检查密钥是否正确
-    -   确认签名算法
-    -   验证数据完整性
-2.  解密失败
-    -   确认密钥格式
-    -   检查加密算法
-    -   验证数据编码
-3.  响应超时
-    -   优化处理逻辑
-    -   增加超时时间
-    -   实现异步处理
+验签/解密失败、回调收不到：见 `../../troubleshooting.md` §二；Java SDK 见 `开始对接/Java-SDK报错说明.md`。
