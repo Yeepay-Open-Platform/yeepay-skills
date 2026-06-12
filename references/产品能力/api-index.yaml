@@ -17,9 +17,10 @@
 #   * 人类可读页 https://open.yeepay.com/docs/products/{product}/api/{uri} 是 SPA，
 #     curl 只返回前端外壳，**不可**用于取字段；仅作给人看的链接。
 #   * api_id 为全局唯一标识，可在 doc_md「基本信息」中核对，用于回复中标注。
+#   * notify_spi 仅为索引提示；实现回调时 MUST 先 curl 接口 doc_md，从「结果通知」节取通知编码与 notify 文档 URL（以 doc_md 为准）。
 
 # 版本以 SKILL.md frontmatter 为准（单一来源）；本字段由发版时同步，validate_docs.py 校验一致性。
-version: "0.6.2"
+version: "0.6.4"
 
 url_templates:
   doc_md:     "https://open.yeepay.com/docs-v3/api/{slug}.md"                     # 主：实现/核对字段必拉（含错误码/示例代码）
@@ -92,7 +93,7 @@ refund:
     path: /rest/v1.0/trade/refund
     api_id: 35122e4a4b5b406797243b86083376e8
     doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_trade_refund.md
-    notify_spi: trade.refund-result   # 待确认 SPI 名
+    notify_spi: trade.refund-result   # 索引提示；以 doc_md「结果通知」节为准
   - id: trade-refund-query
     name: 查询退款
     method: GET
@@ -176,13 +177,19 @@ payout:
     path: /rest/v1.0/account/withdraw/order
     api_id: 772939cdae17484d90784b233b3dd2e5
     doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_account_withdraw_order.md
-    notify_spi: account.withdraw-result   # 待确认 SPI 名
+    notify_spi: account.business.withdraw-result   # 索引提示；以 doc_md「结果通知」节为准
   - id: withdraw-query
     name: 提现查询
     method: GET
     path: /rest/v1.0/account/withdraw/system/query
     api_id: 5dad8cfba0324601adc41740d1664282
     doc_md: https://open.yeepay.com/docs-v3/api/get_rest_v1.0_account_withdraw_system_query.md
+  - id: withdraw-card-bind
+    name: 提现卡添加
+    method: POST
+    path: /rest/v1.0/account/withdraw/card/bind
+    api_id: d7834965f2f54ec7b676305cf4fa7ddc
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_account_withdraw_card_bind.md
   - id: withdraw-card-modify
     name: 提现卡修改/注销
     method: POST
@@ -222,9 +229,4 @@ reconciliation:
     api_id: eb31ff3ac03b4a78881cc0600054b257
     doc_md: https://open.yeepay.com/docs-v3/api/get_yos_v1.0_settle_file_get.md
 
-# 平台通用文档
-platform:
-  # 平台错误码：接口业务码已含在各接口 doc_md 的「错误码」章节；平台级码见在线文档
-  - id: platform-error-codes
-    name: 平台错误码说明
-    doc_md: https://open.yeepay.com/docs-v3/product/fwssfk/平台错误码.md   # 待核对实际地址
+# 平台级错误码见本地 references/平台文档/开始对接/平台错误码说明.md（不走 curl）

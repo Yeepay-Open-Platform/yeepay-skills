@@ -9,7 +9,7 @@ description: >-
   "结算"、"提现"、"对账单"时，或咨询验签失败、回调收不到、查单、错误码排查、沙箱联调、上线检查等
   问题时使用此 Skill。
 disable-model-invocation: true
-version: 0.6.2
+version: 0.6.4
 ---
 
 # 易宝支付接入技能（统一入口）
@@ -124,14 +124,25 @@ version: 0.6.2
 
 ## 技术执行顺序（商户已确认场景且同意继续后）
 
-1. 读 `references/平台文档/` 中与任务相关的规则（签名/加密/回调/接入准备/SDK）。
-2. 写代码任务按上节确认 SDK 使用意愿并选择 L1/L2/L3 路径。
-3. 读 `references/产品能力/产品决策.md` 确认方案与收款主体（标准/平台/服务商）。
-4. 在 `references/产品能力/<业务域>/<场景>.md` 确认流程与易错点。
+1. **核对前提**：对照 `references/产品能力/产品决策.md` 核对已确认的方案与收款主体（标准/平台/服务商）；核对不通过（场景或主体仍有歧义）→ 退回面客纪律①②继续澄清，**不进入后续步骤**。
+2. 在 `references/产品能力/<业务域>/<场景>.md` 核对流程与易错点。
+3. 写代码任务：按「写代码任务路由」确认 SDK 使用意愿，锁定 L1/L2/L3 路径。
+4. **按路径与任务类型读平台文档**（用 `references/平台文档/platform-doc-manifest.yaml` 的 topics 定位；下表为必读，其余按需）：
+
+| 任务特征 | 必读 |
+|----------|------|
+| L1（不使用 SDK） | `平台规范/安全认证/请求签名协议.md`、`回调解密协议.md` |
+| L2（Java SDK） | `开始对接/SDK使用说明.md`（报错时加 `Java-SDK报错说明.md`） |
+| L2'（其他语言 SDK） | `工具与支持/开发工具/平台SDK.md` 定位仓库 README |
+| 涉及出款（account/balance 分组） | `接入准备/密钥管理/CFCA证书介绍.md`、`开始对接/配置IP白名单.md` |
+| 涉及回调 | `平台规范/结果通知机制说明.md` |
+| 排障 | `references/troubleshooting.md`、`开始对接/平台错误码说明.md` |
+
 5. 在 `references/产品能力/api-index.yaml` 定位接口 `doc_md`。
 6. **生成或核对接口字段/错误码前，必须执行文档加载协议（curl doc_md）。**
-7. 需要本地验证时，经④确认后使用 `scripts/`（见 `scripts/README.md`）。
-8. 按「标准输出模板」回复。
+7. 依据 doc_md 与所选路径生成代码/参数表（遵守「示例代码节纪律」）。
+8. 需要本地验证时，经④确认后使用 `scripts/`（见 `scripts/README.md`）。
+9. 按「标准输出模板」回复。
 
 ---
 
@@ -145,7 +156,10 @@ version: 0.6.2
    curl -sS "https://open.yeepay.com/docs-v3/api/<slug>.md"
    slug：<method小写>_<path去掉开头/，/ 换 _>（保留 . 与 -）
    例外：yos 等接口优先用 api-index 已实测的 doc_md；404/403 再试 options_ 前缀。
-3. 涉及回调：curl -sS "https://open.yeepay.com/docs-v3/notify/<notify_spi>.md"
+3. 涉及回调（**以接口 doc_md 为准**）：
+   a. 在上一步拉取的 doc_md 中查找「结果通知」节（含通知编码与 notify 文档链接）。
+   b. 取该节中的通知编码 / notify 文档 URL，curl 拉取 notify 文档后再实现回调解析。
+   c. api-index 的 notify_spi 仅为索引提示；与 doc_md 不一致或缺失时，**以 doc_md 为准**，不得臆造 SPI。
 4. 场景 md 只提供流程与易错点；禁止仅凭它拼接口参数。
 5. curl 失败：提示检查网络；不得编造字段；停止字段级实现。
 6. 回复中注明 doc_md「基本信息」中的 API ID 与「最后更新时间」。
@@ -157,7 +171,7 @@ doc_md「示例代码」节为**自动生成的全参数模板**（含脏占位�
 参数 MUST 按「请求参数」表的必填/条件逻辑重新筛选，**禁止照抄**全部 addParameter 与占位值。
 
 > 人类可读页 `https://open.yeepay.com/docs/products/<product>/api/<uri>` 为 SPA，**curl 取不到字段**。
-> doc_md 章节结构：`基本信息`、`请求参数`、`请求示例`、`响应参数`、`响应示例`、`错误码`、`示例代码`。
+> doc_md 章节结构：`基本信息`、`请求参数`、`请求示例`、`响应参数`、`响应示例`、`错误码`、（有回调时）`结果通知`、`示例代码`。
 > `references/平台文档/` 为本地权威内容，**不走 curl**。
 
 ---
