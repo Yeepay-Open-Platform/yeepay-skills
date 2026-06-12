@@ -19,7 +19,7 @@
 #   * api_id 为全局唯一标识，可在 doc_md「基本信息」中核对，用于回复中标注。
 
 # 版本以 SKILL.md frontmatter 为准（单一来源）；本字段由发版时同步，validate_docs.py 校验一致性。
-version: "0.6.0"
+version: "0.6.1"
 
 url_templates:
   doc_md:     "https://open.yeepay.com/docs-v3/api/{slug}.md"                     # 主：实现/核对字段必拉（含错误码/示例代码）

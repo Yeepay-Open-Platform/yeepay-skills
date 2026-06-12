@@ -7,9 +7,9 @@
 
 ## 二、申请CFCA证书
 
-获取CFCA证书需要在[控制台](https://open.yeepay.com/home?redirect=/developer-center)进行操作，详细步骤如下：
+获取CFCA证书需要在[控制台](https://open.yeepay.com/developer-center)进行操作，详细步骤如下：
 
-1.进入【[控制台](https://open.yeepay.com/home?redirect=/developer-center)】->【开发服务】->【CFCA证书】，点击【立即申请】。 申请证书1  
+1.进入【[控制台](https://open.yeepay.com/developer-center)】->【开发服务】->【CFCA证书】，点击【立即申请】。 申请证书1  
   
 
 
@@ -32,7 +32,7 @@
 
 注意事项：
 
-- 使用此功能前，需要到【[控制台](https://open.yeepay.com/home?redirect=/developer-center)】申请CFCA证书。[查看申请方法](https://open.yeepay.com/docs-v3/platform/3832.md)
+- 使用此功能前，需要到【[控制台](https://open.yeepay.com/developer-center)】申请CFCA证书。[查看申请方法](https://open.yeepay.com/docs-v3/platform/3832.md)
 - CFCA证书类型包括：RSA-2048（国际）、SM2-256（商密）：
 - 生成的私钥或证书需妥善保管，避免遗失，不要泄露。
 
@@ -42,7 +42,7 @@
 
 申请证书4.png
 
-2.（在证书列表激活）：登录[控制台](https://open.yeepay.com/home?redirect=/developer-center)，点击证书列表后点击立即激活。
+2.（在证书列表激活）：登录[控制台](https://open.yeepay.com/developer-center)，点击证书列表后点击立即激活。
 
 申请证书5.png
 

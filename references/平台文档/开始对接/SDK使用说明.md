@@ -9,7 +9,7 @@
 
 ## 二、引入依赖
 
-使用 [Maven Central](https://search.maven.org/search?q=g:com.yeepay.yop.sdk%20a:yop-java-sdk) **最新稳定版**。
+使用 [Maven Central](https://central.sonatype.com/artifact/com.yeepay.yop.sdk/yop-java-sdk) **最新稳定版**。
 
 ```xml
 <dependency>

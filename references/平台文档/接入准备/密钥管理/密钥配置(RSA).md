@@ -1,6 +1,6 @@
 # 配置商户密钥（RSA）
 
-控制台入口：[商户后台](https://mp.yeepay.com/auth/signin) → **开发者中心** → **我的应用** → **密钥配置**。
+控制台入口：[控制台](https://open.yeepay.com/developer-center) → **我的应用** → **密钥配置**。
 
 ## 一、准备工作
 
@@ -11,7 +11,7 @@
 
 ## 二、首次配置
 
-**路径**：登录 [商户后台](https://mp.yeepay.com/auth/signin) → **开发者中心** → **我的应用** → **密钥配置**。
+**路径**：登录 [控制台](https://open.yeepay.com/developer-center) → **我的应用** → **密钥配置**。
 
 1. 选择 **密钥类型** 为「国际密钥（RSA）」。
 2. **密钥格式** 二选一：

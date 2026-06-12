@@ -19,14 +19,14 @@
 
 | 名称 | 语言 | 仓库 / 包 | 环境要求 |
 |------|------|-----------|----------|
-| yop-java-sdk | Java | [Maven Central](https://search.maven.org/search?q=g:com.yeepay.yop.sdk%20a:yop-java-sdk) · [GitHub](https://github.com/yop-platform/yop-java-sdk) | JDK 1.8+；多域名路由需 `4.4.1+` |
+| yop-java-sdk | Java | [Maven Central](https://central.sonatype.com/artifact/com.yeepay.yop.sdk/yop-java-sdk) · [GitHub](https://github.com/yop-platform/yop-java-sdk) | JDK 1.8+；多域名路由需 `4.4.1+` |
 | yop-php-sdk | PHP | [Packagist](https://packagist.org/packages/yeepay/yop-php-sdk) · [GitHub](https://github.com/yop-platform/yop-php-sdk) | PHP 5.5+ |
 | yop-dotnet-sdk | .NET | [GitHub](https://github.com/yop-platform/yop-dotnet-sdk) | .NET Framework 2.0+ |
 | yop-nodejs-sdk | Node.js | `npm i @yeepay/yop-nodejs-sdk` · [GitHub](https://github.com/yop-platform/yop-nodejs-sdk) | Node.js 18+ |
 | yop-python-sdk | Python | [GitHub](https://github.com/yop-platform/yop-python-sdk) | Python 2.7+ |
 | yop-go-sdk | Go | [GitHub](https://github.com/yop-platform/yop-go-sdk) | Go 1.18+ |
 
-版本请使用各包仓库的**最新稳定版**；Java 以 [Maven Central](https://search.maven.org/search?q=g:com.yeepay.yop.sdk%20a:yop-java-sdk) 为准。
+版本请使用各包仓库的**最新稳定版**；Java 以 [Maven Central](https://central.sonatype.com/artifact/com.yeepay.yop.sdk/yop-java-sdk) 为准。
 
 ## 最佳实践
 

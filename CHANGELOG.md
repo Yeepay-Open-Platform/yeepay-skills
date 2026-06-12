@@ -2,6 +2,14 @@
 
 版本规则与发版流程见 `README.md`「版本管理与更新机制」。最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
 
+## 0.6.1 - 2026-06-12
+
+外链与措辞修订：
+
+- 控制台入口统一为 `https://open.yeepay.com/developer-center`（替换旧商户后台登录页与 home?redirect 变体，共 12 处：密钥配置 RSA/SM、CFCA证书制备、密钥工具）。
+- Maven Central 链接更新为新版 `central.sonatype.com/artifact/...`（SDK使用说明、平台SDK）。
+- 平台错误码说明标注【新版】错误码。
+
 ## 0.6.0 - 2026-06-12
 
 评审会落地（后端协议归位 / 前端示例进产品文档 / 测试向量 / 版本机制）：
