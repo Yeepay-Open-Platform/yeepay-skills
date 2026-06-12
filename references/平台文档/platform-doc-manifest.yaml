@@ -2,7 +2,7 @@
 # Agent 查平台规则时优先读本目录；接口字段仍以在线 doc_md 为准。
 
 # 版本以 SKILL.md frontmatter 为准（单一来源）；本字段由发版时同步，validate_docs.py 校验一致性。
-version: "0.6.1"
+version: "0.6.2"
 
 sections:
   - name: 接入准备
@@ -25,6 +25,8 @@ sections:
         topics: [CFCA, 控制台, 轮换]
       - path: 接入准备/密钥管理/CFCA证书介绍.md
         title: CFCA 证书介绍
+        topics: [CFCA, 资金出款, account, balance, 提现, 代付代发]
+        related: [接入准备/密钥管理/CFCA证书制备.md, 开始对接/配置IP白名单.md]
       - path: 接入准备/密钥管理/CFCA证书制备.md
         title: CFCA 证书制备
 

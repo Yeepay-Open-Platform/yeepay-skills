@@ -2,6 +2,16 @@
 
 版本规则与发版流程见 `README.md`「版本管理与更新机制」。最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
 
+## 0.6.2 - 2026-06-12
+
+资金出款类接口 CFCA 证书强约束（遗留问题落地，范围按接口分组界定）：
+
+- `接入准备/密钥管理/CFCA证书介绍.md` 新增「资金出款类接口必须使用 CFCA 证书（强约束）」节：明确 **`account`（账户，`/rest/v1.0/account/...`，如提现下单）与 `balance`（代付代发，`/rest/v1.0/balance/...`，如 transfer_send）分组**必须用证书签名，仅配普通 RSA 文本密钥调用会被拒绝报错；`settle` 分组（结算）不在强制范围；关联证书制备、密钥配置（证书格式）与 IP 白名单。
+- `密钥介绍.md` 两处"高风险接口"措辞改为按 account/balance 分组明确点名并指向 `CFCA证书介绍.md`。
+- `提现.md` 顶部新增前置条件提示（account 分组须 CFCA 证书 + IP 白名单）；`结算.md` 注明 settle 分组不在强制范围、避免误判。
+- `troubleshooting.md` §五 新增排障首条：account/balance 分组接口被拒/签名权限类报错先核对是否使用 CFCA 证书。
+- `SKILL.md` 通用技术纪律新增一条对应纪律；manifest 为 `CFCA证书介绍.md` 补充 topics/related。
+
 ## 0.6.1 - 2026-06-12
 
 外链与措辞修订：
