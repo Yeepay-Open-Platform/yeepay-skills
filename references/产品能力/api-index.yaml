@@ -20,7 +20,7 @@
 #   * notify_spi 仅为索引提示；实现回调时 MUST 先 curl 接口 doc_md，从「结果通知」节取通知编码与 notify 文档 URL（以 doc_md 为准）。
 
 # 版本以 SKILL.md frontmatter 为准（单一来源）；本字段由发版时同步，validate_docs.py 校验一致性。
-version: "0.6.4"
+version: "0.6.5"
 
 url_templates:
   doc_md:     "https://open.yeepay.com/docs-v3/api/{slug}.md"                     # 主：实现/核对字段必拉（含错误码/示例代码）
@@ -81,6 +81,7 @@ acquiring:
     api_id: 1fe6aa427dc941cc8228fe9700a74eab
     doc_md: https://open.yeepay.com/docs-v3/api/get_rest_v1.0_trade_order_query.md
   # 前端唤起说明（产品参数文档，非 api_id 维度）
+  # 本地权威：references/产品能力/收单/prePayTn唤起方式速查.md
   - id: prepay-tn-usage
     name: 聚合统一下单各支付方式唤起方法（prePayTn）
     scene: [frontend-invoke]

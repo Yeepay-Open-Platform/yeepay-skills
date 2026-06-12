@@ -9,7 +9,7 @@ description: >-
   "结算"、"提现"、"对账单"时，或咨询验签失败、回调收不到、查单、错误码排查、沙箱联调、上线检查等
   问题时使用此 Skill。
 disable-model-invocation: true
-version: 0.6.4
+version: 0.6.5
 ---
 
 # 易宝支付接入技能（统一入口）
@@ -203,6 +203,7 @@ doc_md「示例代码」节为**自动生成的全参数模板**（含脏占位�
 | 被扫支付 | `references/产品能力/收单/被扫支付.md` |
 | 主扫支付（独立码-线上PC） | `references/产品能力/收单/主扫支付（独立码-线上PC）.md` |
 | 主扫支付（聚合码） | `references/产品能力/收单/主扫支付（聚合码）.md` |
+| prePayTn 唤起方式速查（跨场景） | `references/产品能力/收单/prePayTn唤起方式速查.md` |
 
 ---
 

@@ -2,6 +2,14 @@
 
 版本规则与发版流程见 `README.md`「版本管理与更新机制」。最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
 
+## 0.6.5 - 2026-06-12
+
+prePayTn 唤起方式速查落地：
+
+- 新增 `产品能力/收单/prePayTn唤起方式速查.md`：聚合统一下单 `payWay + channel + scene` → 返回类型与前端唤起方式速查表。
+- `SKILL.md` 收单场景索引新增跨场景速查条目；6 个收单场景 md 与 `troubleshooting.md` 交叉引用。
+- `api-index.yaml`：`prepay-tn-usage` 标注本地权威路径。
+
 ## 0.6.4 - 2026-06-12
 
 审核缺口修复与回调 SPI 兜底策略：

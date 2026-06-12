@@ -15,6 +15,8 @@ APP 内发起支付，**跳转易宝托管的小程序收银台**完成支付（
 
 支付结果回调：`aggpay-tutelage-pre-pay` 的 `notify_spi: trade.pay-result`。
 
+prePayTn 返回类型与前端唤起方式见 `prePayTn唤起方式速查.md`。
+
 ## 何时选本方案
 
 - 商户**没有自有小程序**或希望最省事：用易宝托管收银台。已有自有小程序见 `APP支付（使用客户小程序）.md`。

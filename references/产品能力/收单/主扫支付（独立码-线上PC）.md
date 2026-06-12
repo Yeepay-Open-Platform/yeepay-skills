@@ -15,6 +15,8 @@
 
 支付结果回调：`aggpay-pre-pay` 的 `notify_spi: trade.pay-result`。
 
+prePayTn 返回类型与前端唤起方式见 `prePayTn唤起方式速查.md`（USER_SCAN → URL 二维码）。
+
 ## 开通产品（产品码）
 
 | 产品名称 | 产品码 |

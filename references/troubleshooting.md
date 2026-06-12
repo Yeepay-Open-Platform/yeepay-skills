@@ -44,7 +44,7 @@
 
 - 同步返回"支付中"不是失败（被扫/风控场景）：轮询查单确认，勿重复下单。
 - `userId`/`openId` 报错：确认 `openId` 基于支付用 `appId` 获取。
-- `prePayTn` 唤起失败：按 catalog `prepay-tn-usage` 的格式实现。
+- `prePayTn` 唤起失败：按 `产品能力/收单/prePayTn唤起方式速查.md` 确认 `payWay + channel + scene` 对应的返回类型与唤起方式（catalog `prepay-tn-usage`）。
 - 终态以「通知 + 查单」为准。
 
 ## 五、退款/出款排障
