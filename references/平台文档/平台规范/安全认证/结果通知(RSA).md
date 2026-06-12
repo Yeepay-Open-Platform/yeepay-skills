@@ -136,4 +136,4 @@ public void parse(HttpServletRequest req) throws IOException {
 
 notifyUrl、重试策略、幂等、查单兜底、成功应答格式等见 `平台规范/结果通知机制说明.md`。
 
-验签/解密失败、回调收不到：见 `../../troubleshooting.md` §二；Java SDK 见 `开始对接/Java-SDK报错说明.md`。
+验签/解密失败、回调收不到：见 `../../../troubleshooting.md` §二；Java SDK 见 `开始对接/Java-SDK报错说明.md`。

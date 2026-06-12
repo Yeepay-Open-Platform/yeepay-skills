@@ -1,7 +1,8 @@
 # 平台文档索引 — Skill 本地权威知识导航
 # Agent 查平台规则时优先读本目录；接口字段仍以在线 doc_md 为准。
 
-version: "0.5.1"
+# 版本以 SKILL.md frontmatter 为准（单一来源）；本字段由发版时同步，validate_docs.py 校验一致性。
+version: "0.6.0"
 
 sections:
   - name: 接入准备
@@ -69,6 +70,14 @@ sections:
         title: 结果通知（RSA）
       - path: 平台规范/安全认证/结果通知(SM2).md
         title: 结果通知（SM2）
+      - path: 平台规范/安全认证/请求签名协议.md
+        title: 请求签名协议（语言中立，不使用 SDK 时实现参考）
+        topics: [Authorization, canonical request, 签名, 测试向量]
+        related: [平台规范/安全认证/鉴权认证机制(RSA).md, 平台规范/安全认证/鉴权认证机制(SM).md]
+      - path: 平台规范/安全认证/回调解密协议.md
+        title: 回调解密协议（语言中立，不使用 SDK 时实现参考）
+        topics: [四段密文, 解密, 验签, 测试向量]
+        related: [平台规范/安全认证/结果通知(RSA).md, 平台规范/安全认证/结果通知(SM2).md]
 
   - name: 工具与支持
     docs:

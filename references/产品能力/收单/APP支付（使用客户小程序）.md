@@ -2,8 +2,8 @@
 
 APP 内发起支付，**跳转商家自有小程序**完成支付（统一下单）。
 
-> 接口字段以在线文档为准：按下表 catalog id 在 `../api-index.yaml` 取其 `api_id`，执行
-> `curl -sS "https://open.yeepay.com/apis/docs/apis/<api_id>/definition.json"` 后再实现。
+> 接口字段以在线文档为准：按下表 catalog id 在 `../api-index.yaml` 取其 `doc_md`，执行
+> `curl -sS "<doc_md>"` 后再实现（单文件含字段/示例/错误码/示例代码）。
 
 ## 场景 → 接口
 
@@ -85,9 +85,100 @@ appid 配置：调 `aggpay-wechat-config-add` 绑定需跳转的小程序 appid 
 
 ## 排障
 
-- 业务错误码：`curl .../apis/<api_id>/errcode.json`。
+- 业务错误码：见 doc_md「错误码」章节（与接口文档同文件）。
 - 平台错误码/验签：`../../troubleshooting.md`、`../../平台文档/开始对接/平台错误码说明.md`。
 
-## 代码示例
+## 前端示例代码
 
-- 加验签/加解密/回调接收：`../../示例代码/`（按需补充）。
+### APP 唤起微信小程序（多端框架 wx.miniapp）
+
+```javascript
+wx.miniapp.launchMiniProgram({
+    userName: '', // 微信小程序原始ID
+    path: '',
+    miniprogramType: 2, //0 release ，1 test, 2 preview
+    success: (res) => {
+        wx.showModal({
+            content: res.data,
+        })
+        console.log('get wx phonenumber success:', res)
+    }
+})
+```
+
+### 微信支付（多端框架 wx.miniapp）
+
+> 空白参数由服务端在易宝平台下单后，会返回 `prepayTn` 参数，这个参数为一个 JSON 串，通过 JSON.parse() 解析。
+
+```javascript
+wx.miniapp.requestPayment({
+    timeStamp: '',
+    mchId: '',
+    prepayId: '',
+    package: '',
+    nonceStr: '',
+    sign: '',
+    success: (res) => {
+      console.warn('wx.miniapp.requestPayment success:', res)
+    },
+    fail: (res) => {
+      console.error('wx.miniapp.requestPayment res:', res)
+    },
+    complete: (res) => {
+      console.error('wx.miniapp.requestPayment res:', res)
+    }
+  })
+```
+
+### APP 原生 SDK 拉起微信支付（OpenSDK）
+
+iOS：
+
+```objective-c
+PayReq *request = [[[PayReq alloc] init] autorelease];
+request.appId = "wxd930ea5d5a258f4f";
+request.partnerId = "1900000109";
+request.prepayId= "1101000000140415649af9fc314aa427",;
+request.package = "Sign=WXPay";
+request.nonceStr= "1101000000140429eb40476f8896f4c9";
+request.timeStamp= "1398746574";
+request.sign= "oR9d8PuhnIc+YZ8cBHFCwfgpaK9gd7vaRvkYD7rthRAZ\/X+QBhcCYL21N7cHCTUxbQ+EAt6Uy+lwSN22f5YZvI45MLko8Pfso0jm46v5hqcVwrk6uddkGuT+Cdvu4WBqDzaDjnNa5UK3GfE1Wfl2gHxIIY5lLdUgWFts17D4WuolLLkiFZV+JSHMvH7eaLdT9N5GBovBwu5yYKUR7skR8Fu+LozcSqQixnlEZUfyE55feLOQTUYzLmR9pNtPbPsu6WVhbNHMS3Ss2+AehHvz+n64GDmXxbX++IOBvm2olHu3PsOUGRwhudhVf7UcGcunXt8cqNjKNqZLhLw4jq\/xDg==";
+[WXApi sendReq：request];
+```
+
+Android：
+
+```java
+IWXAPI api;
+PayReq request = new PayReq();
+request.appId = "wxd930ea5d5a258f4f";
+request.partnerId = "1900000109";
+request.prepayId= "1101000000140415649af9fc314aa427",;
+request.packageValue = "Sign=WXPay";
+request.nonceStr= "1101000000140429eb40476f8896f4c9";
+request.timeStamp= "1398746574";
+request.sign= "oR9d8PuhnIc+YZ8cBHFCwfgpaK9gd7vaRvkYD7rthRAZ\/X+QBhcCYL21N7cHCTUxbQ+EAt6Uy+lwSN22f5YZvI45MLko8Pfso0jm46v5hqcVwrk6uddkGuT+Cdvu4WBqDzaDjnNa5UK3GfE1Wfl2gHxIIY5lLdUgWFts17D4WuolLLkiFZV+JSHMvH7eaLdT9N5GBovBwu5yYKUR7skR8Fu+LozcSqQixnlEZUfyE55feLOQTUYzLmR9pNtPbPsu6WVhbNHMS3Ss2+AehHvz+n64GDmXxbX++IOBvm2olHu3PsOUGRwhudhVf7UcGcunXt8cqNjKNqZLhLw4jq\/xDg==";
+api.sendReq(request);
+```
+
+鸿蒙：
+
+```javascript
+IWXAPI api;
+let req = new wxopensdk.PayReq
+req.appId = 'wxd930ea5d5a258f4f'
+req.partnerId = '1900000109'
+req.prepayId = '1101000000140415649af9fc314aa427'
+req.packageValue = 'Sign=WXPay'
+req.nonceStr = '1101000000140429eb40476f8896f4c9'
+req.timeStamp = '1398746574'
+req.sign = 'oR9d8PuhnIc+YZ8cBHFCwfgpaK9gd7vaRvkYD7rthRAZ\/X+QBhcCYL21N7cHCTUxbQ+EAt6Uy+lwSN22f5YZvI45MLko8Pfso0jm46v5hqcVwrk6uddkGuT+Cdvu4WBqDzaDjnNa5UK3GfE1Wfl2gHxIIY5lLdUgWFts17D4WuolLLkiFZV+JSHMvH7eaLdT9N5GBovBwu5yYKUR7skR8Fu+LozcSqQixnlEZUfyE55feLOQTUYzLmR9pNtPbPsu6WVhbNHMS3Ss2+AehHvz+n64GDmXxbX++IOBvm2olHu3PsOUGRwhudhVf7UcGcunXt8cqNjKNqZLhLw4jq\/xDg=='
+api.sendReq(context: common.UIAbilityContext, req)
+```
+
+> APP 内嵌 H5 唤起小程序支付：H5 页面 `window.location.href = prePayTn` 重定向即可，见 `浏览器H5支付.md` 的「前端示例代码」。
+
+## 后端代码（不使用 SDK 时）
+
+- 加验签：`../../平台文档/平台规范/安全认证/请求签名协议.md`
+- 回调解密验签：`../../平台文档/平台规范/安全认证/回调解密协议.md`

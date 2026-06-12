@@ -1,6 +1,6 @@
 # Java SDK 使用说明（yop-java-sdk）
 
-> 其他语言见 `工具与支持/开发工具/平台SDK.md` 仓库 README。不使用 SDK 见 `示例代码/后端代码/` 协议文档。
+> 其他语言见 `工具与支持/开发工具/平台SDK.md` 仓库 README。不使用 SDK 见 `平台规范/安全认证/` 下的请求签名协议/回调解密协议。
 
 ## 一、环境要求
 
@@ -134,7 +134,7 @@ YosDownloadInputStream in = downloadResp.getResult();
 | RSA | `平台规范/安全认证/结果通知(RSA).md` | `DigitalEnvelopeUtils` 或 `YopCallbackEngine` |
 | SM2 | `平台规范/安全认证/结果通知(SM2).md` | `YopCallbackEngine`（须注册 Handler 并应答签名） |
 
-不使用 SDK：见 `示例代码/后端代码/回调解密协议.md`；本地验证 `scripts/decrypt_notify.py`。网关方案见 `工具与支持/开发工具/结果通知工具.md`。
+不使用 SDK：见 `平台规范/安全认证/回调解密协议.md`；本地验证 `scripts/decrypt_notify.py`。网关方案见 `工具与支持/开发工具/结果通知工具.md`。
 
 ## 七、异常与超时
 

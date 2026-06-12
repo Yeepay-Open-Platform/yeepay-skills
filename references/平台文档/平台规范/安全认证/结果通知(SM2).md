@@ -68,7 +68,7 @@ private Map&lt;String, String&gt; getHeaders(HttpServletRequest request) {
 ### 自实现要点
 
 1. **验签**：校验 `x-yop-content-sm3` 与 body 摘要一致；`Authorization` 验签规则见 `鉴权认证机制(SM).md`。平台证书按 `x-yop-sign-serial-no` 查询（接口 `/rest/v2.0/yop/platform/certs`）。
-2. **解密**：解析请求头 `x-yop-encrypt`（`yop-encrypt-v1` + SM4/CBC/PKCS5Padding）；商户 SM2 私钥解对称密钥，再解 JSON body。报文加密细节见 `报文加密机制(SM).md`（manifest 已索引）；非 SDK 见 `示例代码/后端代码/回调解密协议.md`。
+2. **解密**：解析请求头 `x-yop-encrypt`（`yop-encrypt-v1` + SM4/CBC/PKCS5Padding）；商户 SM2 私钥解对称密钥，再解 JSON body。报文加密细节见 `报文加密机制(SM).md`（manifest 已索引）；非 SDK 见同目录 `回调解密协议.md`。
 3. **Base64**：平台采用 URL 安全 Base64（`+`/`/` → `-`/`_`），解码前须还原。
 
 ## 应答报文
@@ -79,4 +79,4 @@ private Map&lt;String, String&gt; getHeaders(HttpServletRequest request) {
 
 ## 通用机制与排障
 
-notifyUrl、重试、幂等、查单兜底见 `结果通知机制说明.md`。验签/解密失败见 `../../troubleshooting.md` §二。
+notifyUrl、重试、幂等、查单兜底见 `结果通知机制说明.md`。验签/解密失败见 `../../../troubleshooting.md` §二。

@@ -1,17 +1,37 @@
 #!/usr/bin/env python3
-"""平台文档质量守门：检查 references/平台文档/ 下的 markdown 文件。"""
+"""Skill 发版守门。
+
+检查项：
+  1. 平台文档质量（H1/CSS 残留/表格断裂/截图密度）
+  2. 全库过期模式黑名单（旧数据源、已删除目录的引用）
+  3. md 内相对引用死链
+  4. 版本一致性（SKILL.md / CHANGELOG.md / 两个 yaml）
+  5. 签名/回调解密测试向量（脚本实现 + 协议文档「完整示例」一致）
+"""
 
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import subprocess
 import sys
 from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
-PLATFORM_DOC_ROOT = SKILL_ROOT / "references" / "平台文档"
+REFERENCES_ROOT = SKILL_ROOT / "references"
+PLATFORM_DOC_ROOT = REFERENCES_ROOT / "平台文档"
 SCRIPTS_DIR = Path(__file__).resolve().parent
+VECTOR_DIR = SCRIPTS_DIR / "tests" / "vectors"
+
+# 全库禁止出现的过期模式（CHANGELOG.md 作为历史记录豁免）
+STALE_PATTERNS = {
+    "definition.json": "旧数据源，应改用 doc_md（docs-v3/api/<slug>.md）",
+    "errcode.json": "旧数据源，错误码在 doc_md「错误码」章节",
+    "apis/docs/apis": "旧数据源 URL，应改用 doc_md",
+    "示例代码/后端代码": "目录已迁移至 平台文档/平台规范/安全认证/",
+    "references/示例代码": "目录已删除，前端示例在产品场景 md，后端协议在 安全认证/",
+}
 
 
 def _strip_fenced_code(text: str) -> str:
@@ -56,6 +76,109 @@ def check_file(path: Path) -> list[str]:
     if img_count > 3:
         issues.append(f"{rel}: 截图引用 {img_count} 处（建议 ≤3，以文字步骤为主）")
 
+    return issues
+
+
+def _all_md_files() -> list[Path]:
+    files = [SKILL_ROOT / "SKILL.md", SKILL_ROOT / "README.md", SKILL_ROOT / "CHANGELOG.md"]
+    files += sorted(REFERENCES_ROOT.rglob("*.md"))
+    return [f for f in files if f.exists()]
+
+
+def check_stale_patterns() -> list[str]:
+    issues: list[str] = []
+    for md in _all_md_files():
+        if md.name == "CHANGELOG.md":
+            continue
+        text = md.read_text(encoding="utf-8", errors="replace")
+        rel = md.relative_to(SKILL_ROOT)
+        for pattern, hint in STALE_PATTERNS.items():
+            if pattern in text:
+                issues.append(f"{rel}: 含过期模式「{pattern}」（{hint}）")
+    return issues
+
+
+def check_dead_links() -> list[str]:
+    """检查 md 中以反引号/链接形式引用的 .md 相对路径是否存在。"""
+    issues: list[str] = []
+    ref_pattern = re.compile(r"`([^`\s]+\.md)`|\]\(([^)\s]+\.md)\)")
+    for md in _all_md_files():
+        text = _strip_fenced_code(md.read_text(encoding="utf-8", errors="replace"))
+        rel = md.relative_to(SKILL_ROOT)
+        for match in ref_pattern.finditer(text):
+            target = match.group(1) or match.group(2)
+            if target.startswith("http"):
+                continue
+            if "<" in target or ">" in target:  # 模板占位路径，如 <域>/<场景>.md
+                continue
+            if "/" in target:
+                bases = (md.parent, REFERENCES_ROOT, PLATFORM_DOC_ROOT, SKILL_ROOT)
+                if not any((base / target).exists() for base in bases):
+                    issues.append(f"{rel}: 引用不存在的文件 `{target}`")
+            else:
+                # 裸文件名：同名文件需在 skill 内任意位置存在
+                if not (list(SKILL_ROOT.glob(target)) or list(SKILL_ROOT.rglob(target))):
+                    issues.append(f"{rel}: 引用不存在的文件 `{target}`")
+    return issues
+
+
+def check_version_consistency() -> list[str]:
+    issues: list[str] = []
+    versions: dict[str, str | None] = {}
+
+    skill_text = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+    m = re.search(r"^version:\s*([\d.]+)\s*$", skill_text, re.M)
+    versions["SKILL.md"] = m.group(1) if m else None
+
+    for name, path in {
+        "api-index.yaml": REFERENCES_ROOT / "产品能力" / "api-index.yaml",
+        "platform-doc-manifest.yaml": PLATFORM_DOC_ROOT / "platform-doc-manifest.yaml",
+    }.items():
+        m = re.search(r'^version:\s*"([\d.]+)"\s*$', path.read_text(encoding="utf-8"), re.M)
+        versions[name] = m.group(1) if m else None
+
+    changelog = SKILL_ROOT / "CHANGELOG.md"
+    m = re.search(r"^## ([\d.]+) - ", changelog.read_text(encoding="utf-8"), re.M)
+    versions["CHANGELOG.md 首条"] = m.group(1) if m else None
+
+    expected = versions["SKILL.md"]
+    if not expected:
+        return ["SKILL.md: 未找到 frontmatter version"]
+    for name, ver in versions.items():
+        if ver != expected:
+            issues.append(f"版本不一致：{name}={ver}，期望与 SKILL.md 一致（{expected}）")
+    return issues
+
+
+def check_vectors() -> list[str]:
+    """脚本实现与向量一致 + 协议文档「完整示例」与向量一致。"""
+    issues: list[str] = []
+    proc = subprocess.run(
+        [sys.executable, str(SCRIPTS_DIR / "verify_vectors.py")],
+        capture_output=True, text=True,
+    )
+    if proc.returncode != 0:
+        issues.append(f"测试向量校验失败：{(proc.stderr or proc.stdout).strip()}")
+        return issues
+
+    auth_dir = PLATFORM_DOC_ROOT / "平台规范" / "安全认证"
+    sign_doc = (auth_dir / "请求签名协议.md").read_text(encoding="utf-8")
+    sign_vectors = json.loads((VECTOR_DIR / "sign_vectors.json").read_text(encoding="utf-8"))
+    for case in sign_vectors["cases"]:
+        expected = case["expected"]
+        if expected["content_sha256"] not in sign_doc:
+            issues.append(f"请求签名协议.md: 缺少向量 [{case['name']}] 的 content_sha256")
+    # 文档逐行展示前两个用例的 Authorization；第 3 个用例指向 JSON 文件
+    for case in sign_vectors["cases"][:2]:
+        if case["expected"]["authorization"] not in sign_doc:
+            issues.append(f"请求签名协议.md: 缺少/不匹配向量 [{case['name']}] 的 Authorization")
+
+    notify_doc = (auth_dir / "回调解密协议.md").read_text(encoding="utf-8")
+    notify_vector = json.loads((VECTOR_DIR / "notify_vector.json").read_text(encoding="utf-8"))
+    if notify_vector["ciphertext"] not in notify_doc:
+        issues.append("回调解密协议.md: 完整示例密文与 notify_vector.json 不一致")
+    if notify_vector["plaintext"] not in notify_doc:
+        issues.append("回调解密协议.md: 完整示例明文与 notify_vector.json 不一致")
     return issues
 
 
@@ -121,25 +244,29 @@ def run_notify_roundtrip() -> list[str]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="校验平台文档质量")
+    parser = argparse.ArgumentParser(description="Skill 发版守门")
     parser.add_argument("--with-notify-test", action="store_true", help="执行 mock/decrypt 互打")
     args = parser.parse_args()
 
     all_issues: list[str] = []
     for md in sorted(PLATFORM_DOC_ROOT.rglob("*.md")):
         all_issues.extend(check_file(md))
+    all_issues.extend(check_stale_patterns())
+    all_issues.extend(check_dead_links())
+    all_issues.extend(check_version_consistency())
+    all_issues.extend(check_vectors())
 
     if args.with_notify_test:
         all_issues.extend(run_notify_roundtrip())
 
     if all_issues:
-        print("平台文档校验未通过：")
+        print("发版守门未通过：")
         for item in all_issues:
             print(f"  - {item}")
         return 1
 
-    count = len(list(PLATFORM_DOC_ROOT.rglob("*.md")))
-    print(f"平台文档校验通过（{count} 个文件）")
+    count = len(_all_md_files())
+    print(f"发版守门通过（共检查 {count} 个 md 文件 + 版本一致性 + 测试向量）")
     return 0
 
 

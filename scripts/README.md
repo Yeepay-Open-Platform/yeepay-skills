@@ -12,14 +12,17 @@ pip install -r requirements.txt
 
 | 脚本 | 用途 | 依据文档 |
 |------|------|----------|
-| `yop_client.py` | YOP RSA 鉴权客户端（被其他脚本复用） | `鉴权认证机制(RSA).md`、`请求签名协议.md` |
+| `yop_client.py` | YOP RSA 鉴权客户端（被其他脚本复用） | `安全认证/鉴权认证机制(RSA).md`、`安全认证/请求签名协议.md` |
 | `gen_keypair.py` | 生成 RSA/SM2 密钥对 | `密钥工具.md` |
 | `query_order.py` | 查单 | doc_md + api-index.yaml |
 | `refund.py` | 退款申请/查询 | doc_md + api-index.yaml |
-| `mock_notify.py` | 模拟发结果通知 | `结果通知(RSA).md`、`回调解密协议.md` |
-| `decrypt_notify.py` | 回调密文解密验签 | `回调解密协议.md` |
-| `notify_crypto.py` | 四段密文编解码（内部模块） | `回调解密协议.md` |
-| `validate_docs.py` | 平台文档质量守门（H1/CSS/表格/截图密度） | `references/平台文档/` |
+| `mock_notify.py` | 模拟发结果通知 | `安全认证/结果通知(RSA).md`、`安全认证/回调解密协议.md` |
+| `decrypt_notify.py` | 回调密文解密验签 | `安全认证/回调解密协议.md` |
+| `notify_crypto.py` | 四段密文编解码（内部模块） | `安全认证/回调解密协议.md` |
+| `verify_vectors.py` | 签名/回调解密测试向量校验（`--regen` 重算） | `tests/vectors/` + 两份协议文档「完整示例」 |
+| `validate_docs.py` | 发版守门（文档质量/死链/过期模式/版本一致/测试向量） | 全 `references/` + SKILL/README/CHANGELOG |
+
+> 协议文档位于 `../references/平台文档/平台规范/安全认证/`。
 
 ## mock_notify 两种模式
 
@@ -60,12 +63,18 @@ python decrypt_notify.py --cipher "$(tail -1 /tmp/cipher.txt)" \
   --yop-pubkey ./keys/rsa_public.pem
 ```
 
-## 文档质量校验
+## 发版守门
 
 ```bash
-python validate_docs.py
-python validate_docs.py --with-notify-test   # 含 mock/decrypt 互打
+python validate_docs.py                      # 文档质量 + 死链 + 过期模式 + 版本一致 + 测试向量
+python validate_docs.py --with-notify-test   # 额外含 mock/decrypt 互打
 ```
+
+## 测试向量（tests/vectors/）
+
+固定测试密钥与签名/回调解密的输入输出期望值，供商户自研实现逐字节比对（详见两份协议文档「完整示例」）。
+协议实现变更时：`python verify_vectors.py --regen` 重算 → 同步协议文档示例 → 提升 Skill 版本。
+**测试密钥仅供向量使用，禁止用于任何真实环境。**
 
 ## 重要约定
 

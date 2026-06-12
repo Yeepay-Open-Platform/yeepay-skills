@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """RSA 结果通知密文编解码（四段 $ 格式）。
 
-与 references/示例代码/后端代码/回调解密协议.md、
+与 references/平台文档/平台规范/安全认证/回调解密协议.md、
 YopRsaCallbackExample.java 步骤一致；仅用于联调验证。
 """
 
@@ -94,11 +94,15 @@ def _verify(source: bytes, signature: bytes, public_key) -> bool:
         return False
 
 
-def encrypt_notify(plaintext: str, yop_private_key, merchant_public_key) -> str:
-    """构造四段密文：encRandomKey$encData$AES$SHA256"""
+def encrypt_notify(plaintext: str, yop_private_key, merchant_public_key,
+                   aes_key: bytes = None) -> str:
+    """构造四段密文：encRandomKey$encData$AES$SHA256
+
+    aes_key 可显式传入以复现固定测试向量（见 tests/vectors/）。
+    """
     sign = _sign(plaintext.encode("utf-8"), yop_private_key)
     inner = plaintext + SEPARATOR + _b64encode(sign)
-    aes_key = secrets.token_bytes(16)
+    aes_key = aes_key or secrets.token_bytes(16)
     enc_data = _aes_encrypt(inner.encode("utf-8"), aes_key)
     enc_key = _rsa_encrypt(aes_key, merchant_public_key)
     return SEPARATOR.join([_b64encode(enc_key), _b64encode(enc_data), AES_ALG, DIGEST_ALG])

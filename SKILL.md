@@ -9,7 +9,7 @@ description: >-
   "结算"、"提现"、"对账单"时，或咨询验签失败、回调收不到、查单、错误码排查、沙箱联调、上线检查等
   问题时使用此 Skill。
 disable-model-invocation: true
-version: 0.5.1
+version: 0.6.0
 ---
 
 # 易宝支付接入技能（统一入口）
@@ -115,8 +115,8 @@ version: 0.5.1
   │    Java → SDK使用说明.md（L2）+ doc_md 调用骨架（L3）
   │    其他语言 → 平台SDK.md 定位仓库 README（L2'）+ doc_md 参数表（L3）
   └─ 否（语言无 SDK，或主动不引依赖/自研网关/合规限制）：
-       示例代码/后端代码/ 协议文档（L1）实现签名/加密/回调解密
-       + doc_md 参数表（L3）+ scripts/ 本地验证
+       平台文档/平台规范/安全认证/ 的请求签名协议.md、回调解密协议.md（L1）
+       实现签名/加密/回调解密 + doc_md 参数表（L3）+ scripts/ 本地验证
 ```
 
 ---
@@ -271,19 +271,18 @@ doc_md「示例代码」节为**自动生成的全参数模板**（含脏占位�
 
 ```text
 SKILL.md                       本文件，唯一入口（面客纪律 + 技术执行）
-scripts/                       Python 联调工具 + validate_docs.py 文档质量守门
+CHANGELOG.md                   变更历史（版本以本文件 frontmatter 为唯一来源）
+scripts/                       Python 联调工具 + validate_docs.py 发版守门 + tests/vectors/ 测试向量
 references/
   平台文档/                    本地权威（约 30 篇，索引见 platform-doc-manifest.yaml）
     接入准备/                  快速接入、应用管理、密钥管理(CFCA/RSA/SM)
     开始对接/                  SDK使用说明、沙箱、IP白名单、平台错误码、Java-SDK报错
     平台规范/                  上线检查、回调网络配置、结果通知机制/查询重发、安全认证
+      安全认证/                鉴权/加密/结果通知机制 + 请求签名协议/回调解密协议（不使用 SDK 时实现参考，含测试向量）
     工具与支持/                平台SDK、密钥工具、接入诊断、YOP-MCP、常见问题
   产品能力/
     产品决策.md                选型、关键词、澄清模板、超范围回复
     api-index.yaml             API curl 清单（doc_md / path / method / api_id）
-    收单/ 退款/ 分账/ 出款/ 对账/   场景文档（流程+易错点+引用）
-  示例代码/
-    后端代码/                  请求签名/回调解密协议（不使用 SDK 时）
-    前端代码/                  小程序/H5 前端示例
+    收单/ 退款/ 分账/ 出款/ 对账/   场景文档（流程+易错点+前端示例代码+引用）
   troubleshooting.md           各业务域排障汇总
 ```

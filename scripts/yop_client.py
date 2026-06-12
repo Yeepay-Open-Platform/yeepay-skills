@@ -72,12 +72,16 @@ def _sign(private_key, canonical_request: str) -> str:
 
 
 def build_request(app_key, private_key_pem, method, path, params=None,
-                  json_body=None, base_url=DEFAULT_OPENAPI, expire_seconds=1800):
-    """构造已签名的请求（url, headers, body）。不直接发送，便于自检与复用。"""
+                  json_body=None, base_url=DEFAULT_OPENAPI, expire_seconds=1800,
+                  timestamp=None, request_id=None):
+    """构造已签名的请求（url, headers, body）。不直接发送，便于自检与复用。
+
+    timestamp/request_id 可显式传入以复现固定测试向量（见 tests/vectors/）。
+    """
     method = method.upper()
     params = params or {}
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    request_id = str(uuid.uuid4())
+    timestamp = timestamp or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    request_id = request_id or str(uuid.uuid4())
 
     is_form = method == "POST" and json_body is None
     content_type = (

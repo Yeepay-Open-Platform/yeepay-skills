@@ -1,0 +1,59 @@
+{
+  "app_key": "app_10086032562",
+  "timestamp": "2026-01-01T00:00:00Z",
+  "request_id": "00000000-0000-4000-8000-000000000001",
+  "expire_seconds": 1800,
+  "cases": [
+    {
+      "name": "GET 查单（query 含空格，验证 %20 编码与 key 升序）",
+      "method": "GET",
+      "path": "/rest/v1.0/trade/order/query",
+      "params": {
+        "merchantNo": "10086032562",
+        "orderId": "TEST ORDER_20260101_001"
+      },
+      "json_body": null,
+      "expected": {
+        "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "canonical_request": "yop-auth-v3/app_10086032562/2026-01-01T00:00:00Z/1800\nGET\n/rest/v1.0/trade/order/query\nmerchantNo=10086032562&orderId=TEST%20ORDER_20260101_001\nx-yop-appkey:app_10086032562\nx-yop-content-sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\nx-yop-request-id:00000000-0000-4000-8000-000000000001",
+        "authorization": "YOP-RSA2048-SHA256 yop-auth-v3/app_10086032562/2026-01-01T00:00:00Z/1800/x-yop-appkey;x-yop-content-sha256;x-yop-request-id/bUFNGdhl1AmLzJYhBTRp3G9kuT4gofeyyLwXaR37NTQOA49gjViUtjU_2SmJwX6BRarrmqtSfrNBaEibeyjg8YqMgb_jXEIR8Fl3J0TKRWeRlOEZ74hmJIV_afbUORD_kvG540PpcCAkVZaSNm2bE0zObk3B48LI5Nhu_ZLDZdtcU6AwXDzPg0WKsZCKgACFvVUyQ8FoRRZpyPQtqFkjz6PSWzY3ll7wP4buD3pPB8ebGpTTmxndy3qzu0zGF88S7iDlR6d0Tlx4IA9lL8n1o8_96drIGvWfyP0-Ee-VTdao2eFsFhC6X95na1nGAyipZESGu1MchYE6sumeFjIUVA$SHA256",
+        "body": null,
+        "url": "https://openapi.yeepay.com/rest/v1.0/trade/order/query?merchantNo=10086032562&orderId=TEST%20ORDER_20260101_001"
+      }
+    },
+    {
+      "name": "POST Form 退款（body 含中文，canonicalQueryString 为空串）",
+      "method": "POST",
+      "path": "/rest/v1.0/trade/refund",
+      "params": {
+        "merchantNo": "10086032562",
+        "orderId": "TEST_ORDER_20260101_001",
+        "refundRequestId": "REFUND_20260101_001",
+        "refundAmount": "0.01",
+        "description": "测试退款"
+      },
+      "json_body": null,
+      "expected": {
+        "content_sha256": "a95bf5b62724cdd27e199e50ee2af246d9268f8752d02f0288ad16fc97fef710",
+        "canonical_request": "yop-auth-v3/app_10086032562/2026-01-01T00:00:00Z/1800\nPOST\n/rest/v1.0/trade/refund\n\ncontent-type:application%2Fx-www-form-urlencoded\nx-yop-appkey:app_10086032562\nx-yop-content-sha256:a95bf5b62724cdd27e199e50ee2af246d9268f8752d02f0288ad16fc97fef710\nx-yop-request-id:00000000-0000-4000-8000-000000000001",
+        "authorization": "YOP-RSA2048-SHA256 yop-auth-v3/app_10086032562/2026-01-01T00:00:00Z/1800/content-type;x-yop-appkey;x-yop-content-sha256;x-yop-request-id/UCVhKDfYjLgziWR1UCmzip4euRxN83KHEV_pq73A_8gieKmkJCRn5-Bvh0h1a1bykVv8HTfJ24MaJQZm6va9vdLXPACcwBvK-huDlvgRRECGu6vwb8GQPit465aWl4hJ_adBR93gCrFIEvYs4FyIola0MnkTk5H9I57976WFaez-D6ZuvodMKaIq-ffDFyCQy10sYnOXqs4lspx_gEI2luNWPFN_4E_U_mmaI8q6Ty4WQXIuDNYTcyQEwR4Jcwz1owo3QacBsiwfvYc36gJROPmHQ7fC87nRAwPtzmf9TGv5Ua0fRYAOZCSpzHbybc39YjZk39FfiOLr-vogoDMJyw$SHA256",
+        "body": "description=%E6%B5%8B%E8%AF%95%E9%80%80%E6%AC%BE&merchantNo=10086032562&orderId=TEST_ORDER_20260101_001&refundAmount=0.01&refundRequestId=REFUND_20260101_001",
+        "url": "https://openapi.yeepay.com/rest/v1.0/trade/refund"
+      }
+    },
+    {
+      "name": "POST JSON（content-sha256 取 JSON 原文，canonicalQueryString 为空串）",
+      "method": "POST",
+      "path": "/rest/v1.0/test/json-demo",
+      "params": null,
+      "json_body": "{\"merchantNo\":\"10086032562\",\"orderId\":\"TEST_ORDER_20260101_001\",\"orderAmount\":\"0.01\",\"goodsName\":\"测试商品\"}",
+      "expected": {
+        "content_sha256": "3529747095a7e29bcacbbdfa9314f6785f880279cedd629608f9d65a17d3e001",
+        "canonical_request": "yop-auth-v3/app_10086032562/2026-01-01T00:00:00Z/1800\nPOST\n/rest/v1.0/test/json-demo\n\ncontent-type:application%2Fjson\nx-yop-appkey:app_10086032562\nx-yop-content-sha256:3529747095a7e29bcacbbdfa9314f6785f880279cedd629608f9d65a17d3e001\nx-yop-request-id:00000000-0000-4000-8000-000000000001",
+        "authorization": "YOP-RSA2048-SHA256 yop-auth-v3/app_10086032562/2026-01-01T00:00:00Z/1800/content-type;x-yop-appkey;x-yop-content-sha256;x-yop-request-id/WRFaO-PRt4lWLYY0TUVQzoJAowxm1WpfctIvA7g6x8aAuD4KCwp1IA_rrmda_9hePudhdpu62sSe1_WL0Tl2xJsgByZg7ii5Iso01QAcPw5Ii0RIfggXZn1eqayGsmGmJtf6OMCzSQb-KM9e440XSZ4xi473FyNoxSCmnGygkAlOE_uYXqCQfwKkPoNLZGdXHqDEwpl-OPRJDF0yX1Wtj6vkdHZ15LUXvW1Q-zdd1EDObyC5qfJP-v5ly1Db4tjYqwzMmhg0TUR6mBUx-ZozasFiNl__aBfBOqDN3GtMtfjR7_-yhBr98bpDm1PAO_Vnc63K0kvNEvgEVYG9E-IjRQ$SHA256",
+        "body": "{\"merchantNo\":\"10086032562\",\"orderId\":\"TEST_ORDER_20260101_001\",\"orderAmount\":\"0.01\",\"goodsName\":\"测试商品\"}",
+        "url": "https://openapi.yeepay.com/rest/v1.0/test/json-demo"
+      }
+    }
+  ]
+}
