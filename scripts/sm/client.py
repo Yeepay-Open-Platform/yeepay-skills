@@ -99,6 +99,10 @@ def build_request(app_key, private_key_hex, method, path, params=None,
     if content_type:
         headers["Content-Type"] = content_type
 
+    from common.yop_headers import build_standard_headers
+
+    headers.update(build_standard_headers())
+
     url = base_url.rstrip("/") + path
     if method == "GET" and params:
         url = f"{url}?{_canonical_form(params)}"

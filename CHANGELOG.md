@@ -2,6 +2,14 @@
 
 版本规则与发版流程见 `README.md`「版本管理与更新机制」。最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
 
+## 0.6.21 - 2026-06-22
+
+出站请求补充 SDK 标准头：
+
+- 新增 `common/yop_headers.py`：`x-yop-sdk-version` 固定 `4.0.0`，`x-yop-sdk-langs`，`x-yop-session-id` 进程启动时生成、运行期间不变，`User-Agent` 第二段为 Python 运行时版本
+- `rsa/client.py`、`sm/client.py` 签名后自动附带标准头，避免网关返回旧版响应格式
+- `请求签名协议.md` 补充 SDK 标准头说明
+
 ## 0.6.18 - 2026-06-22
 
 小程序支付补充支付宝小程序接入：
