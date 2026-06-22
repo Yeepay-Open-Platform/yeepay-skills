@@ -6,7 +6,7 @@
 字段以在线 doc_md 文档为准，本脚本仅演示鉴权与调用。
 
 用法：
-    python query_order.py \
+    python rsa/query_order.py \\
         --appkey app_100xxx \
         --key ./keys/rsa_private_pkcs8.pem \
         --merchant 100xxx \
@@ -18,8 +18,14 @@
 import argparse
 import json
 import os
+import sys
+from pathlib import Path
 
-import yop_client
+_SCRIPTS_DIR = Path(__file__).resolve().parent.parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from rsa import client as yop_client
 
 
 def main():

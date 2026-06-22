@@ -9,10 +9,10 @@
 
 用法：
     # 申请退款
-    python refund.py apply --appkey app_100xxx --key ./keys/rsa_private_pkcs8.pem \
+    python rsa/refund.py apply --appkey app_100xxx --key ./keys/rsa_private_pkcs8.pem \\
         --merchant 100xxx --order-id ORDER_xxx --refund-id REFUND_xxx --amount 0.01
     # 查询退款
-    python refund.py query --appkey app_100xxx --key ./keys/rsa_private_pkcs8.pem \
+    python rsa/refund.py query --appkey app_100xxx --key ./keys/rsa_private_pkcs8.pem \\
         --merchant 100xxx --order-id ORDER_xxx --refund-id REFUND_xxx
 
 注意：退款单号(refund-id)需业务唯一；重试请用同一单号避免重复退款。
@@ -21,8 +21,14 @@
 import argparse
 import json
 import os
+import sys
+from pathlib import Path
 
-import yop_client
+_SCRIPTS_DIR = Path(__file__).resolve().parent.parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from rsa import client as yop_client
 
 
 def _common(p):

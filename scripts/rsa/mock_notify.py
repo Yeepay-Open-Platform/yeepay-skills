@@ -7,11 +7,9 @@
   real：按真实四段密文格式（encKey$encData$AES$SHA256）构造，可与 decrypt_notify.py 互打验证。
 
 用法：
-    # 简化模式
-    python mock_notify.py --url http://127.0.0.1:8080/notify --key ./merchant.pem --data '{"orderId":"x"}'
+    python rsa/mock_notify.py --url http://127.0.0.1:8080/notify --key ./merchant.pem --data '{"orderId":"x"}'
 
-    # 真实密文模式
-    python mock_notify.py --mode real \\
+    python rsa/mock_notify.py --mode real \\
         --url http://127.0.0.1:8080/notify \\
         --yop-key ./yop_private.pem \\
         --merchant-pubkey ./merchant_public.pem \\
@@ -22,11 +20,17 @@ import argparse
 import base64
 import json
 import os
+import sys
+from pathlib import Path
+
+_SCRIPTS_DIR = Path(__file__).resolve().parent.parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
 
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
-from notify_crypto import encrypt_notify, load_key
+from rsa.notify_crypto import encrypt_notify, load_key
 
 try:
     import requests
@@ -93,7 +97,7 @@ def main():
             load_key(args.merchant_pubkey, "public"),
         )
         headers = {"Content-Type": "text/plain"}
-        print("== 模式: real（四段密文，可用 decrypt_notify.py 验证）==")
+        print("== 模式: real（四段密文，可用 rsa/decrypt_notify.py 验证）==")
 
     print("== 发送 body ==")
     print(body)

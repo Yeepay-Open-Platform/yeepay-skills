@@ -22,7 +22,8 @@ SKILL_ROOT = Path(__file__).resolve().parent.parent
 REFERENCES_ROOT = SKILL_ROOT / "references"
 PLATFORM_DOC_ROOT = REFERENCES_ROOT / "平台文档"
 SCRIPTS_DIR = Path(__file__).resolve().parent
-VECTOR_DIR = SCRIPTS_DIR / "tests" / "vectors"
+RSA_VECTOR_DIR = SCRIPTS_DIR / "rsa" / "tests" / "vectors"
+SM_VECTOR_DIR = SCRIPTS_DIR / "sm" / "tests" / "vectors"
 
 # 全库禁止出现的过期模式（CHANGELOG.md 作为历史记录豁免）
 STALE_PATTERNS = {
@@ -163,7 +164,7 @@ def check_vectors() -> list[str]:
 
     auth_dir = PLATFORM_DOC_ROOT / "平台规范" / "安全认证"
     sign_doc = (auth_dir / "请求签名协议.md").read_text(encoding="utf-8")
-    sign_vectors = json.loads((VECTOR_DIR / "sign_vectors.json").read_text(encoding="utf-8"))
+    sign_vectors = json.loads((RSA_VECTOR_DIR / "sign_vectors.json").read_text(encoding="utf-8"))
     for case in sign_vectors["cases"]:
         expected = case["expected"]
         if expected["content_sha256"] not in sign_doc:
@@ -174,7 +175,7 @@ def check_vectors() -> list[str]:
             issues.append(f"请求签名协议.md: 缺少/不匹配向量 [{case['name']}] 的 Authorization")
 
     notify_doc = (auth_dir / "回调解密协议.md").read_text(encoding="utf-8")
-    notify_vector = json.loads((VECTOR_DIR / "notify_vector.json").read_text(encoding="utf-8"))
+    notify_vector = json.loads((RSA_VECTOR_DIR / "notify_vector.json").read_text(encoding="utf-8"))
     if notify_vector["ciphertext"] not in notify_doc:
         issues.append("回调解密协议.md: 完整示例密文与 notify_vector.json 不一致")
     if notify_vector["plaintext"] not in notify_doc:
@@ -184,23 +185,27 @@ def check_vectors() -> list[str]:
 
 def run_notify_roundtrip() -> list[str]:
     issues: list[str] = []
-    gen = SCRIPTS_DIR / "gen_keypair.py"
-    mock = SCRIPTS_DIR / "mock_notify.py"
-    decrypt = SCRIPTS_DIR / "decrypt_notify.py"
+    gen = SCRIPTS_DIR / "rsa" / "gen_keypair.py"
+    mock = SCRIPTS_DIR / "rsa" / "mock_notify.py"
+    decrypt = SCRIPTS_DIR / "rsa" / "decrypt_notify.py"
     if not all(p.exists() for p in (gen, mock, decrypt)):
         return issues
 
     import tempfile
 
     with tempfile.TemporaryDirectory() as tmp:
-        key_dir = Path(tmp) / "keys"
-        subprocess.run(
-            [sys.executable, str(gen), "--alg", "rsa", "--out", str(key_dir)],
-            check=True,
-            capture_output=True,
-        )
-        priv = key_dir / "rsa_private_pkcs8.pem"
-        pub = key_dir / "rsa_public.pem"
+        yop_dir = Path(tmp) / "yop"
+        merchant_dir = Path(tmp) / "merchant"
+        for out_dir in (yop_dir, merchant_dir):
+            subprocess.run(
+                [sys.executable, str(gen), "--out", str(out_dir)],
+                check=True,
+                capture_output=True,
+            )
+        yop_priv = yop_dir / "rsa_private_pkcs8.pem"
+        yop_pub = yop_dir / "rsa_public.pem"
+        merchant_priv = merchant_dir / "rsa_private_pkcs8.pem"
+        merchant_pub = merchant_dir / "rsa_public.pem"
         proc = subprocess.run(
             [
                 sys.executable,
@@ -211,9 +216,9 @@ def run_notify_roundtrip() -> list[str]:
                 "--url",
                 "http://127.0.0.1:8080/notify",
                 "--yop-key",
-                str(priv),
+                str(yop_priv),
                 "--merchant-pubkey",
-                str(pub),
+                str(merchant_pub),
                 "--data",
                 '{"status":"SUCCESS","orderId":"VALIDATE"}',
             ],
@@ -231,15 +236,91 @@ def run_notify_roundtrip() -> list[str]:
                 "--cipher",
                 cipher,
                 "--merchant-key",
-                str(priv),
+                str(merchant_priv),
                 "--yop-pubkey",
-                str(pub),
+                str(yop_pub),
             ],
             capture_output=True,
             text=True,
         )
         if proc2.returncode != 0 or "验签通过" not in proc2.stdout:
             issues.append(f"decrypt_notify 互打失败: {proc2.stderr or proc2.stdout}")
+    return issues
+
+
+def run_notify_sm_roundtrip() -> list[str]:
+    issues: list[str] = []
+    gen = SCRIPTS_DIR / "sm" / "gen_keypair.py"
+    mock = SCRIPTS_DIR / "sm" / "mock_notify.py"
+    decrypt = SCRIPTS_DIR / "sm" / "decrypt_notify.py"
+    if not all(p.exists() for p in (gen, mock, decrypt)):
+        return issues
+
+    import json
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        yop_dir = Path(tmp) / "yop"
+        merchant_dir = Path(tmp) / "merchant"
+        for out_dir in (yop_dir, merchant_dir):
+            subprocess.run(
+                [sys.executable, str(gen), "--out", str(out_dir)],
+                check=True,
+                capture_output=True,
+            )
+        yop_priv = yop_dir / "sm2_private_pkcs8.pem"
+        yop_pub = yop_dir / "sm2_public.pem"
+        merchant_priv = merchant_dir / "sm2_private_pkcs8.pem"
+        merchant_pub = merchant_dir / "sm2_public.pem"
+        proc = subprocess.run(
+            [
+                sys.executable,
+                str(mock),
+                "--mode",
+                "real",
+                "--dry-run",
+                "--url",
+                "http://127.0.0.1:8080/notify",
+                "--yop-key",
+                str(yop_priv),
+                "--merchant-pubkey",
+                str(merchant_pub),
+                "--data",
+                '{"status":"SUCCESS","orderId":"VALIDATE_SM"}',
+            ],
+            capture_output=True,
+            text=True,
+        )
+        if proc.returncode != 0:
+            issues.append(f"mock_notify (SM) 失败: {proc.stderr.strip()}")
+            return issues
+        lines = proc.stdout.strip().splitlines()
+        body = lines[-1]
+        headers = {}
+        for line in lines:
+            if ": " in line and not line.startswith("=="):
+                name, value = line.split(": ", 1)
+                headers[name] = value
+        headers_path = Path(tmp) / "headers.json"
+        headers_path.write_text(json.dumps(headers, ensure_ascii=False), encoding="utf-8")
+        proc2 = subprocess.run(
+            [
+                sys.executable,
+                str(decrypt),
+                "--headers-file",
+                str(headers_path),
+                "--body",
+                body,
+                "--merchant-key",
+                str(merchant_priv),
+                "--yop-pubkey",
+                str(yop_pub),
+            ],
+            capture_output=True,
+            text=True,
+        )
+        if proc2.returncode != 0 or "验签通过" not in proc2.stdout:
+            issues.append(f"decrypt_notify (SM) 互打失败: {proc2.stderr or proc2.stdout}")
     return issues
 
 
@@ -258,6 +339,7 @@ def main() -> int:
 
     if args.with_notify_test:
         all_issues.extend(run_notify_roundtrip())
+        all_issues.extend(run_notify_sm_roundtrip())
 
     if all_issues:
         print("发版守门未通过：")

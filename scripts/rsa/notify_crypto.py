@@ -98,7 +98,7 @@ def encrypt_notify(plaintext: str, yop_private_key, merchant_public_key,
                    aes_key: bytes = None) -> str:
     """构造四段密文：encRandomKey$encData$AES$SHA256
 
-    aes_key 可显式传入以复现固定测试向量（见 tests/vectors/）。
+    aes_key 可显式传入以复现固定测试向量（见 rsa/tests/vectors/）。
     """
     sign = _sign(plaintext.encode("utf-8"), yop_private_key)
     inner = plaintext + SEPARATOR + _b64encode(sign)

@@ -1,83 +1,52 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""易宝 YOP 开放平台轻量客户端（RSA 鉴权）。
+"""易宝 YOP 开放平台轻量客户端（SM2/SM3 鉴权）。
 
 仅用于联调与本地验证，不用于生产交易/出款。
-签名实现依据：references/平台文档/平台规范/安全认证/鉴权认证机制(RSA).md
+签名实现依据：references/平台文档/平台规范/安全认证/鉴权认证机制(SM).md
 
 依赖：
-    pip install cryptography requests
+    pip install gmssl requests
 """
 
-import base64
-import hashlib
 import uuid
 from datetime import datetime, timezone
 from urllib.parse import quote
 
 try:
     import requests
-except ImportError:  # 延迟报错，便于仅做签名自检时不强依赖 requests
+except ImportError:
     requests = None
 
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding
+from .crypto import SECURITY_REQ, PROTOCOL_VERSION, sign_sm3, sm3_hex
 
-PROTOCOL_VERSION = "yop-auth-v3"
-SECURITY_REQ = "YOP-RSA2048-SHA256"
 DEFAULT_OPENAPI = "https://openapi.yeepay.com"
 DEFAULT_YOS = "https://yos.yeepay.com"
 
 
 def _quote(value: str) -> str:
-    """RFC3986 URL 编码：空格转 %20，保留 A-Za-z0-9-_.~（Python quote 默认即满足）。"""
     return quote(str(value), safe="")
 
 
-def _load_private_key(pem: str):
-    """加载 PKCS8/PKCS1 PEM 私钥；支持传入纯 Base64（自动补 PEM 头尾）。"""
-    pem = pem.strip()
-    if "BEGIN" not in pem:
-        pem = (
-            "-----BEGIN PRIVATE KEY-----\n"
-            + "\n".join(pem[i : i + 64] for i in range(0, len(pem), 64))
-            + "\n-----END PRIVATE KEY-----\n"
-        )
-    return serialization.load_pem_private_key(pem.encode("utf-8"), password=None)
-
-
 def _canonical_form(params: dict) -> str:
-    """form 参数：urlencode 后按 key 升序，用 & 拼接。"""
     items = sorted((k, "" if v is None else v) for k, v in params.items())
     return "&".join(f"{_quote(k)}={_quote(v)}" for k, v in items)
 
 
-def _content_sha256(method: str, content_type: str, params: dict, json_body: str) -> str:
+def _content_sm3(method: str, content_type: str, params: dict, json_body: str) -> str:
     if method == "GET":
-        payload = ""
+        payload = b""
     elif json_body is not None:
-        payload = json_body
-    else:  # POST form
-        payload = _canonical_form(params or {})
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+        payload = json_body.encode("utf-8")
+    else:
+        payload = _canonical_form(params or {}).encode("utf-8")
+    return sm3_hex(payload)
 
 
-def _sign(private_key, canonical_request: str) -> str:
-    sig = private_key.sign(
-        canonical_request.encode("utf-8"),
-        padding.PKCS1v15(),
-        hashes.SHA256(),
-    )
-    return base64.urlsafe_b64encode(sig).decode("ascii").rstrip("=") + "$SHA256"
-
-
-def build_request(app_key, private_key_pem, method, path, params=None,
+def build_request(app_key, private_key_hex, method, path, params=None,
                   json_body=None, base_url=DEFAULT_OPENAPI, expire_seconds=1800,
-                  timestamp=None, request_id=None):
-    """构造已签名的请求（url, headers, body）。不直接发送，便于自检与复用。
-
-    timestamp/request_id 可显式传入以复现固定测试向量（见 tests/vectors/）。
-    """
+                  timestamp=None, request_id=None, sign_random_hex=None):
+    """构造已签名的 SM 请求（url, headers, body）。"""
     method = method.upper()
     params = params or {}
     timestamp = timestamp or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -90,12 +59,11 @@ def build_request(app_key, private_key_pem, method, path, params=None,
         else None
     )
 
-    content_sha256 = _content_sha256(method, content_type, params, json_body)
+    content_sm3 = _content_sm3(method, content_type, params, json_body)
 
-    # 参与签名的标头
     signed = {
         "x-yop-appkey": app_key,
-        "x-yop-content-sha256": content_sha256,
+        "x-yop-content-sm3": content_sm3,
         "x-yop-request-id": request_id,
     }
     if content_type:
@@ -103,26 +71,30 @@ def build_request(app_key, private_key_pem, method, path, params=None,
 
     auth_string = f"{PROTOCOL_VERSION}/{app_key}/{timestamp}/{expire_seconds}"
     signed_headers = ";".join(sorted(signed.keys()))
-
-    # GET 的规范查询串；POST(form/json) 一律空串
     canonical_qs = _canonical_form(params) if method == "GET" else ""
-
     canonical_headers = "\n".join(
         f"{_quote(k)}:{_quote(v)}" for k, v in sorted(signed.items())
     )
-
     canonical_request = "\n".join([
         auth_string, method, path, canonical_qs, canonical_headers,
     ])
 
-    signature = _sign(_load_private_key(private_key_pem), canonical_request)
+    from .crypto import load_sm2_private
+
+    private_hex = load_sm2_private(private_key_hex)
+
+    signature = sign_sm3(
+        canonical_request.encode("utf-8"),
+        private_hex,
+        random_hex=sign_random_hex,
+    )
     authorization = f"{SECURITY_REQ} {auth_string}/{signed_headers}/{signature}"
 
     headers = {
         "Authorization": authorization,
         "x-yop-appkey": app_key,
         "x-yop-request-id": request_id,
-        "x-yop-content-sha256": content_sha256,
+        "x-yop-content-sm3": content_sm3,
     }
     if content_type:
         headers["Content-Type"] = content_type
@@ -141,16 +113,15 @@ def build_request(app_key, private_key_pem, method, path, params=None,
     return {
         "url": url, "method": method, "headers": headers, "body": body,
         "request_id": request_id, "timestamp": timestamp,
-        "canonical_request": canonical_request,
+        "canonical_request": canonical_request, "content_sm3": content_sm3,
     }
 
 
-def call(app_key, private_key_pem, method, path, params=None, json_body=None,
+def call(app_key, private_key_hex, method, path, params=None, json_body=None,
          base_url=DEFAULT_OPENAPI, timeout=30):
-    """发送已签名请求并返回 requests.Response。"""
     if requests is None:
         raise RuntimeError("缺少依赖 requests：pip install requests")
-    req = build_request(app_key, private_key_pem, method, path, params, json_body, base_url)
-    if method.upper() == "GET":
+    req = build_request(app_key, private_key_hex, method, path, params, json_body, base_url)
+    if req["method"] == "GET":
         return requests.get(req["url"], headers=req["headers"], timeout=timeout)
     return requests.post(req["url"], headers=req["headers"], data=req["body"], timeout=timeout)

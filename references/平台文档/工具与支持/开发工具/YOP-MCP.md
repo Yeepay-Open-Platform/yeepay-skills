@@ -97,7 +97,7 @@ uvx yop-mcp
 4. 结果通知实现路径（择一，详见对应文档）
 - Java SDK：YopCallbackEngine（RSA/SM2）或 DigitalEnvelopeUtils（仅 RSA）
 - 网关方案：工具与支持/开发工具/结果通知工具.md
-- 非 SDK：平台规范/安全认证/回调解密协议.md，可用 scripts/decrypt_notify.py 本地验证
+- 非 SDK：平台规范/安全认证/回调解密协议.md，可用 `scripts/rsa/decrypt_notify.py` 本地验证
 ```
 
 ## 使用 YOP MCP

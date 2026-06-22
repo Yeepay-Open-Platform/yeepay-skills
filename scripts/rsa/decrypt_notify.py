@@ -3,7 +3,7 @@
 """回调密文解密验签工具（RSA 四段格式）。
 
 用法：
-    python decrypt_notify.py \
+    python rsa/decrypt_notify.py \\
         --cipher 'encKey$encData$AES$SHA256' \
         --merchant-key ./keys/rsa_private_pkcs8.pem \
         --yop-pubkey ./keys/yop_public.pem
@@ -12,8 +12,13 @@
 import argparse
 import os
 import sys
+from pathlib import Path
 
-from notify_crypto import decrypt_notify, load_key
+_SCRIPTS_DIR = Path(__file__).resolve().parent.parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from rsa.notify_crypto import decrypt_notify, load_key
 
 
 def main():

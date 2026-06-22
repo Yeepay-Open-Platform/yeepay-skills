@@ -2,6 +2,46 @@
 
 版本规则与发版流程见 `README.md`「版本管理与更新机制」。最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
 
+## 0.6.12 - 2026-06-16
+
+SM2 密钥输出格式与 RSA 对齐：
+
+- `sm/gen_keypair.py` 改为输出 `sm2_private_pkcs8.pem` / `sm2_public.pem`（PKCS8/SPKI PEM），不再生成 hex 文件。
+- `sm/crypto.py` 新增 PEM 导出；`load_sm2_*` 仅接受 PKCS8/SPKI PEM（文件或 PEM 文本）。
+- SM2 测试向量密钥文件由 `.hex` 转为 `.pem`（密钥材料不变）。
+
+## 0.6.11 - 2026-06-16
+
+RSA 脚本目录重组：
+
+- 将 RSA 相关脚本迁入 `scripts/rsa/`，与 `scripts/sm/` 对称；RSA 测试向量迁至 `scripts/rsa/tests/vectors/`。
+- 根目录仅保留 `validate_docs.py`、`verify_vectors.py` 等公共守门脚本。
+- 更新 `scripts/README.md`、`scripts/rsa/README.md`、SKILL 工具表及协议文档路径引用。
+
+## 0.6.10 - 2026-06-16
+
+国密脚本目录重组：
+
+- 将 SM2 相关脚本迁入 `scripts/sm/`，与 RSA 根目录脚本分离；SM2 测试向量迁至 `scripts/sm/tests/vectors/`。
+- 根目录 `gen_keypair.py` 仅保留 RSA；SM2 使用 `sm/gen_keypair.py`。
+- 更新 `scripts/README.md`、`scripts/sm/README.md`、SKILL 工具表及 `密钥介绍.md` 路径引用。
+
+## 0.6.9 - 2026-06-22
+
+SM2 全链路脚本与 RSA 互打测试修复：
+
+- 新增 `sm2_crypto.py`、`yop_client_sm.py`、`notify_crypto_sm.py`、`mock_notify_sm.py`、`decrypt_notify_sm.py`。
+- 新增 SM2 测试向量：`sign_sm_vectors.json`、`notify_sm_vector.json` 及对应 hex 密钥。
+- `validate_docs.py`：`run_notify_roundtrip` 改为易宝/商户双钥互打；新增 SM2 互打测试。
+- `回调解密协议.md`：同步 RSA 向量密文（encKey 段随 PKCS1 随机填充变化）。
+
+## 0.6.8 - 2026-06-22
+
+SM2 密钥生成修复：
+
+- `scripts/gen_keypair.py`：改用 gmssl `CryptSM2.default_ecc_table`（SM2P256V1）生成标准 SM2 密钥对，移除错误的 SECP256K1 占位实现；生成后签名自检。
+- `scripts/README.md`、`密钥介绍.md`：补充 SM2 输出格式、CFCA 与脚本能力边界说明。
+
 ## 0.6.7 - 2026-06-12
 
 产品决策澄清模板微调：

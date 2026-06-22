@@ -3,7 +3,7 @@
 """签名/回调解密测试向量的生成与校验。
 
 用途：
-  1. 校验（默认）：用 tests/vectors/ 中的固定输入重新计算签名、解密固定密文，
+  1. 校验（默认）：用 rsa/tests/vectors/ 与 sm/tests/vectors/ 中的固定输入重新计算签名、解密固定密文，
      与向量文件中的期望输出逐项比对——保证协议文档中的示例与脚本实现不漂移。
   2. 重新生成（--regen）：协议实现变更时重算向量并回写 JSON；
      重算后必须同步更新协议文档中的「完整示例」并提升 Skill 版本。
@@ -20,17 +20,35 @@ from pathlib import Path
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-import notify_crypto
-import yop_client
+from rsa import client as rsa_client
+from rsa import notify_crypto as rsa_notify_crypto
+from sm import client as sm_client
+from sm import notify_crypto as sm_notify_crypto
+from sm.crypto import (
+    export_sm2_private_pem,
+    export_sm2_public_pem,
+    generate_sm2_keypair,
+    load_sm2_private,
+    load_sm2_public,
+)
 
-VECTOR_DIR = Path(__file__).resolve().parent / "tests" / "vectors"
+SCRIPTS_DIR = Path(__file__).resolve().parent
+RSA_VECTOR_DIR = SCRIPTS_DIR / "rsa" / "tests" / "vectors"
+SM_VECTOR_DIR = SCRIPTS_DIR / "sm" / "tests" / "vectors"
 
-MERCHANT_PRIVATE = VECTOR_DIR / "test_merchant_private.pem"
-MERCHANT_PUBLIC = VECTOR_DIR / "test_merchant_public.pem"
-YOP_PRIVATE = VECTOR_DIR / "test_yop_private.pem"
-YOP_PUBLIC = VECTOR_DIR / "test_yop_public.pem"
-SIGN_VECTORS = VECTOR_DIR / "sign_vectors.json"
-NOTIFY_VECTOR = VECTOR_DIR / "notify_vector.json"
+MERCHANT_PRIVATE = RSA_VECTOR_DIR / "test_merchant_private.pem"
+MERCHANT_PUBLIC = RSA_VECTOR_DIR / "test_merchant_public.pem"
+YOP_PRIVATE = RSA_VECTOR_DIR / "test_yop_private.pem"
+YOP_PUBLIC = RSA_VECTOR_DIR / "test_yop_public.pem"
+SIGN_VECTORS = RSA_VECTOR_DIR / "sign_vectors.json"
+NOTIFY_VECTOR = RSA_VECTOR_DIR / "notify_vector.json"
+
+MERCHANT_SM2_PRIVATE = SM_VECTOR_DIR / "test_merchant_sm2_private.pem"
+MERCHANT_SM2_PUBLIC = SM_VECTOR_DIR / "test_merchant_sm2_public.pem"
+YOP_SM2_PRIVATE = SM_VECTOR_DIR / "test_yop_sm2_private.pem"
+YOP_SM2_PUBLIC = SM_VECTOR_DIR / "test_yop_sm2_public.pem"
+SIGN_SM_VECTORS = SM_VECTOR_DIR / "sign_sm_vectors.json"
+NOTIFY_SM_VECTOR = SM_VECTOR_DIR / "notify_sm_vector.json"
 
 # ---- 固定输入（修改即破坏向量，须 --regen 并同步文档） ----
 
@@ -76,6 +94,29 @@ NOTIFY_PLAINTEXT = (
 )
 NOTIFY_AES_KEY_HEX = "000102030405060708090a0b0c0d0e0f"
 
+SM_SIGN_RANDOM_HEX = "a" * 64
+SM_SIGN_CASE = {
+    "name": "POST Form 退款（SM2/SM3）",
+    "method": "POST",
+    "path": "/rest/v1.0/trade/refund",
+    "params": {
+        "merchantNo": "10086032562",
+        "orderId": "TEST_ORDER_20260101_001",
+        "refundRequestId": "REFUND_20260101_001",
+        "refundAmount": "0.01",
+        "description": "测试退款",
+    },
+    "json_body": None,
+}
+
+NOTIFY_SM_PLAINTEXT = NOTIFY_PLAINTEXT
+NOTIFY_SM4_KEY_HEX = "00112233445566778899aabbccddeeff"
+NOTIFY_SM4_IV_HEX = "0102030405060708090a0b0c0d0e0f10"
+NOTIFY_SM_APP_KEY = APP_KEY
+NOTIFY_SM_REQUEST_ID = "00000000-0000-4000-8000-000000000002"
+NOTIFY_SM_TIMESTAMP = "2026-01-01T00:00:00Z"
+NOTIFY_SM_URI = "/notify/sm-vector"
+
 
 def _gen_keypair(private_path: Path, public_path: Path) -> None:
     key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
@@ -91,7 +132,7 @@ def _gen_keypair(private_path: Path, public_path: Path) -> None:
 
 
 def _compute_sign_case(case: dict, merchant_pem: str) -> dict:
-    req = yop_client.build_request(
+    req = rsa_client.build_request(
         APP_KEY, merchant_pem, case["method"], case["path"],
         params=case["params"], json_body=case["json_body"],
         expire_seconds=EXPIRE_SECONDS, timestamp=TIMESTAMP, request_id=REQUEST_ID,
@@ -105,8 +146,32 @@ def _compute_sign_case(case: dict, merchant_pem: str) -> dict:
     }
 
 
+def _ensure_sm2_keypair(private_path: Path, public_path: Path) -> None:
+    if private_path.exists() and public_path.exists():
+        return
+    priv, pub = generate_sm2_keypair()
+    private_path.write_bytes(export_sm2_private_pem(priv, pub))
+    public_path.write_bytes(export_sm2_public_pem(pub))
+
+
+def _compute_sm_sign_case(case: dict, merchant_priv_pem: str) -> dict:
+    req = sm_client.build_request(
+        APP_KEY, merchant_priv_pem, case["method"], case["path"],
+        params=case["params"], json_body=case["json_body"],
+        expire_seconds=EXPIRE_SECONDS, timestamp=TIMESTAMP, request_id=REQUEST_ID,
+        sign_random_hex=SM_SIGN_RANDOM_HEX,
+    )
+    return {
+        "content_sm3": req["headers"]["x-yop-content-sm3"],
+        "canonical_request": req["canonical_request"],
+        "authorization": req["headers"]["Authorization"],
+        "body": req["body"],
+        "url": req["url"],
+    }
+
+
 def regen() -> None:
-    VECTOR_DIR.mkdir(parents=True, exist_ok=True)
+    RSA_VECTOR_DIR.mkdir(parents=True, exist_ok=True)
     if not MERCHANT_PRIVATE.exists():
         _gen_keypair(MERCHANT_PRIVATE, MERCHANT_PUBLIC)
     if not YOP_PRIVATE.exists():
@@ -127,9 +192,9 @@ def regen() -> None:
     SIGN_VECTORS.write_text(
         json.dumps(sign_vectors, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    yop_priv = notify_crypto.load_key(str(YOP_PRIVATE), "private")
-    merchant_pub = notify_crypto.load_key(str(MERCHANT_PUBLIC), "public")
-    ciphertext = notify_crypto.encrypt_notify(
+    yop_priv = rsa_notify_crypto.load_key(str(YOP_PRIVATE), "private")
+    merchant_pub = rsa_notify_crypto.load_key(str(MERCHANT_PUBLIC), "public")
+    ciphertext = rsa_notify_crypto.encrypt_notify(
         NOTIFY_PLAINTEXT, yop_priv, merchant_pub,
         aes_key=bytes.fromhex(NOTIFY_AES_KEY_HEX))
     notify_vector = {
@@ -139,7 +204,54 @@ def regen() -> None:
     }
     NOTIFY_VECTOR.write_text(
         json.dumps(notify_vector, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    SM_VECTOR_DIR.mkdir(parents=True, exist_ok=True)
+    _ensure_sm2_keypair(MERCHANT_SM2_PRIVATE, MERCHANT_SM2_PUBLIC)
+    _ensure_sm2_keypair(YOP_SM2_PRIVATE, YOP_SM2_PUBLIC)
+    merchant_sm2_priv = load_sm2_private(str(MERCHANT_SM2_PRIVATE))
+    yop_sm2_priv = load_sm2_private(str(YOP_SM2_PRIVATE))
+    merchant_sm2_pub = load_sm2_public(str(MERCHANT_SM2_PUBLIC))
+    yop_sm2_pub = load_sm2_public(str(YOP_SM2_PUBLIC))
+
+    sign_sm_vectors = {
+        "app_key": APP_KEY,
+        "timestamp": TIMESTAMP,
+        "request_id": REQUEST_ID,
+        "expire_seconds": EXPIRE_SECONDS,
+        "sign_random_hex": SM_SIGN_RANDOM_HEX,
+        "cases": [],
+    }
+    entry = {k: SM_SIGN_CASE[k] for k in ("name", "method", "path", "params", "json_body")}
+    entry["expected"] = _compute_sm_sign_case(SM_SIGN_CASE, str(MERCHANT_SM2_PRIVATE))
+    sign_sm_vectors["cases"].append(entry)
+    SIGN_SM_VECTORS.write_text(
+        json.dumps(sign_sm_vectors, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    headers, body = sm_notify_crypto.encrypt_notify(
+        NOTIFY_SM_PLAINTEXT,
+        yop_sm2_priv,
+        merchant_sm2_pub,
+        app_key=NOTIFY_SM_APP_KEY,
+        request_id=NOTIFY_SM_REQUEST_ID,
+        timestamp=NOTIFY_SM_TIMESTAMP,
+        uri=NOTIFY_SM_URI,
+        sm4_key=bytes.fromhex(NOTIFY_SM4_KEY_HEX),
+        iv=bytes.fromhex(NOTIFY_SM4_IV_HEX),
+        sign_random_hex=SM_SIGN_RANDOM_HEX,
+    )
+    notify_sm_vector = {
+        "plaintext": NOTIFY_SM_PLAINTEXT,
+        "sm4_key_hex": NOTIFY_SM4_KEY_HEX,
+        "sm4_iv_hex": NOTIFY_SM4_IV_HEX,
+        "headers": headers,
+        "body": body,
+        "uri": NOTIFY_SM_URI,
+    }
+    NOTIFY_SM_VECTOR.write_text(
+        json.dumps(notify_sm_vector, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
     print(f"[regen] 已写入 {SIGN_VECTORS.name} / {NOTIFY_VECTOR.name}")
+    print(f"[regen] 已写入 {SIGN_SM_VECTORS.name} / {NOTIFY_SM_VECTOR.name}")
     print("[regen] 请同步更新 请求签名协议.md / 回调解密协议.md 的「完整示例」并提升 Skill 版本")
 
 
@@ -160,10 +272,10 @@ def verify() -> list[str]:
                     f"  期望: {expect}\n  实际: {actual.get(field)}")
 
     notify_vector = json.loads(NOTIFY_VECTOR.read_text(encoding="utf-8"))
-    merchant_priv = notify_crypto.load_key(str(MERCHANT_PRIVATE), "private")
-    yop_pub = notify_crypto.load_key(str(YOP_PUBLIC), "public")
+    merchant_priv = rsa_notify_crypto.load_key(str(MERCHANT_PRIVATE), "private")
+    yop_pub = rsa_notify_crypto.load_key(str(YOP_PUBLIC), "public")
     try:
-        plain = notify_crypto.decrypt_notify(
+        plain = rsa_notify_crypto.decrypt_notify(
             notify_vector["ciphertext"], merchant_priv, yop_pub)
         if plain != notify_vector["plaintext"]:
             errors.append("回调向量不匹配：解密明文与期望不一致")
@@ -171,15 +283,49 @@ def verify() -> list[str]:
         errors.append(f"回调向量解密失败：{e}")
 
     # AES 随机密钥固定时密文应可整体复现
-    yop_priv = notify_crypto.load_key(str(YOP_PRIVATE), "private")
-    merchant_pub = notify_crypto.load_key(str(MERCHANT_PUBLIC), "public")
-    rebuilt = notify_crypto.encrypt_notify(
+    yop_priv = rsa_notify_crypto.load_key(str(YOP_PRIVATE), "private")
+    merchant_pub = rsa_notify_crypto.load_key(str(MERCHANT_PUBLIC), "public")
+    rebuilt = rsa_notify_crypto.encrypt_notify(
         notify_vector["plaintext"], yop_priv, merchant_pub,
         aes_key=bytes.fromhex(notify_vector["aes_key_hex"]))
     enc_data_expect = notify_vector["ciphertext"].split("$")[1]
     enc_data_actual = rebuilt.split("$")[1]
     if enc_data_actual != enc_data_expect:
         errors.append("回调向量不匹配：encData 段不可复现（AES/签名实现变更？）")
+
+    sm_files = (
+        MERCHANT_SM2_PRIVATE, YOP_SM2_PUBLIC, SIGN_SM_VECTORS, NOTIFY_SM_VECTOR,
+    )
+    for f in sm_files:
+        if not f.exists():
+            errors.append(f"缺少 SM2 向量文件：{f}（先运行 verify_vectors.py --regen）")
+            return errors
+
+    sign_sm_vectors = json.loads(SIGN_SM_VECTORS.read_text(encoding="utf-8"))
+    merchant_sm2_priv = load_sm2_private(str(MERCHANT_SM2_PRIVATE))
+    for case in sign_sm_vectors["cases"]:
+        actual = _compute_sm_sign_case(case, str(MERCHANT_SM2_PRIVATE))
+        for field, expect in case["expected"].items():
+            if actual.get(field) != expect:
+                errors.append(
+                    f"SM2 签名向量不匹配 [{case['name']}] 字段 {field}：\n"
+                    f"  期望: {expect}\n  实际: {actual.get(field)}")
+
+    notify_sm_vector = json.loads(NOTIFY_SM_VECTOR.read_text(encoding="utf-8"))
+    header_map = dict(notify_sm_vector["headers"])
+    header_map["_canonical_uri"] = notify_sm_vector.get("uri", "/notify")
+    try:
+        plain = sm_notify_crypto.decrypt_notify(
+            header_map,
+            notify_sm_vector["body"],
+            merchant_sm2_priv,
+            load_sm2_public(str(YOP_SM2_PUBLIC)),
+        )
+        if plain != notify_sm_vector["plaintext"]:
+            errors.append("SM2 回调向量不匹配：解密明文与期望不一致")
+    except ValueError as e:
+        errors.append(f"SM2 回调向量解密失败：{e}")
+
     return errors
 
 

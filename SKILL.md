@@ -9,7 +9,7 @@ description: >-
   "结算"、"提现"、"对账单"时，或咨询验签失败、回调收不到、查单、错误码排查、沙箱联调、上线检查等
   问题时使用此 Skill。
 disable-model-invocation: true
-version: 0.6.7
+version: 0.6.12
 ---
 
 # 易宝支付接入技能（统一入口）
@@ -211,11 +211,8 @@ doc_md「示例代码」节为**自动生成的全参数模板**（含脏占位�
 
 | 用途 | 脚本 |
 |------|------|
-| 生成密钥对（RSA/SM2） | `scripts/gen_keypair.py` |
-| 查单 | `scripts/query_order.py` |
-| 退款 | `scripts/refund.py` |
-| 模拟发结果通知（simple / real） | `scripts/mock_notify.py` |
-| 回调密文解密验签 | `scripts/decrypt_notify.py` |
+| RSA 联调（密钥/查单/退款/回调） | `scripts/rsa/`（见 `scripts/rsa/README.md`） |
+| 国密 SM2（密钥/签名/回调） | `scripts/sm/`（见 `scripts/sm/README.md`） |
 
 > 运行任何脚本前须完成面客纪律 ②③④；仅用于联调，生产走商户自有系统。详见 `scripts/README.md`。
 
@@ -288,7 +285,7 @@ doc_md「示例代码」节为**自动生成的全参数模板**（含脏占位�
 ```text
 SKILL.md                       本文件，唯一入口（面客纪律 + 技术执行）
 CHANGELOG.md                   变更历史（版本以本文件 frontmatter 为唯一来源）
-scripts/                       Python 联调工具 + validate_docs.py 发版守门 + tests/vectors/ 测试向量
+scripts/                       Python 联调工具（rsa/ + sm/）+ validate_docs.py 发版守门
 references/
   平台文档/                    本地权威（约 30 篇，索引见 platform-doc-manifest.yaml）
     接入准备/                  快速接入、应用管理、密钥管理(CFCA/RSA/SM)

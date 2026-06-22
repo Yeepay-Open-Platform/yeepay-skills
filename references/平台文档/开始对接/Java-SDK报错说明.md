@@ -251,5 +251,5 @@ SDK 4.x 默认 v3，与 v2 主要差异：
 | 生产验签失败 | 是否误设 env；易宝公钥是否生产环境 |
 | 升级 SDK 后编译失败 | 业务 SDK 是否同步下载；类名 V2 |
 | 依赖冲突 / 类找不到 | shade 包姿势；排除传递依赖 |
-| 回调解密失败 | `结果通知机制说明.md` + `结果通知(RSA).md` / `结果通知(SM2).md`；非 SDK 用 `scripts/decrypt_notify.py` |
+| 回调解密失败 | `结果通知机制说明.md` + `结果通知(RSA).md` / `结果通知(SM2).md`；非 SDK 用 `scripts/rsa/decrypt_notify.py` 或 `scripts/sm/decrypt_notify.py` |
 | 超时 | 单笔 timeout > 全局；查单后再重试写操作 |

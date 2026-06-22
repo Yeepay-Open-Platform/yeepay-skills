@@ -6,7 +6,7 @@
 
 1. 登录商户后台所需的账号信息。
 2. 已制备商户 RSA 密钥或 CFCA 证书：
-   - 普通密钥：`密钥介绍.md` §四 + `密钥工具.md`，或联调 `scripts/gen_keypair.py --alg rsa`。
+   - 普通密钥：`密钥介绍.md` §四 + `密钥工具.md`，或联调 `scripts/rsa/gen_keypair.py`。
    - 高风险接口（代付代发等）：须 CFCA 证书，见 `CFCA证书制备.md`。
 
 ## 二、首次配置

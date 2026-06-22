@@ -134,7 +134,7 @@ YosDownloadInputStream in = downloadResp.getResult();
 | RSA | `平台规范/安全认证/结果通知(RSA).md` | `DigitalEnvelopeUtils` 或 `YopCallbackEngine` |
 | SM2 | `平台规范/安全认证/结果通知(SM2).md` | `YopCallbackEngine`（须注册 Handler 并应答签名） |
 
-不使用 SDK：见 `平台规范/安全认证/回调解密协议.md`；本地验证 `scripts/decrypt_notify.py`。网关方案见 `工具与支持/开发工具/结果通知工具.md`。
+不使用 SDK：见 `平台规范/安全认证/回调解密协议.md`；本地验证 `scripts/rsa/decrypt_notify.py`。网关方案见 `工具与支持/开发工具/结果通知工具.md`。
 
 ## 七、异常与超时
 
