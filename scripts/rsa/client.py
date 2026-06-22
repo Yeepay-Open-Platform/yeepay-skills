@@ -146,11 +146,31 @@ def build_request(app_key, private_key_pem, method, path, params=None,
 
 
 def call(app_key, private_key_pem, method, path, params=None, json_body=None,
-         base_url=DEFAULT_OPENAPI, timeout=30):
-    """发送已签名请求并返回 requests.Response。"""
+         base_url=DEFAULT_OPENAPI, timeout=30, verify=False, yop_pubkey=None,
+         strict_verify=False):
+    """发送已签名请求并返回 requests.Response。
+
+    verify=True 时对响应做平台应答验签，须提供 yop_pubkey（或环境变量 YOP_PLATFORM_PUBLIC_KEY）。
+    """
     if requests is None:
         raise RuntimeError("缺少依赖 requests：pip install requests")
     req = build_request(app_key, private_key_pem, method, path, params, json_body, base_url)
     if method.upper() == "GET":
-        return requests.get(req["url"], headers=req["headers"], timeout=timeout)
-    return requests.post(req["url"], headers=req["headers"], data=req["body"], timeout=timeout)
+        resp = requests.get(req["url"], headers=req["headers"], timeout=timeout)
+    else:
+        resp = requests.post(req["url"], headers=req["headers"], data=req["body"], timeout=timeout)
+
+    if verify:
+        import os
+
+        from common.response_verify import ResponseVerifyError, verify_http_response
+
+        pubkey = yop_pubkey or os.getenv("YOP_PLATFORM_PUBLIC_KEY")
+        try:
+            if verify_http_response(
+                resp, algorithm="rsa", yop_pubkey=pubkey, strict_missing=strict_verify,
+            ):
+                resp.yop_sign_verified = True  # type: ignore[attr-defined]
+        except ResponseVerifyError as e:
+            raise RuntimeError(f"应答验签失败：{e}") from e
+    return resp

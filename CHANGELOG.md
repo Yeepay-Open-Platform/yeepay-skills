@@ -2,11 +2,49 @@
 
 版本规则与发版流程见 `README.md`「版本管理与更新机制」。最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
 
-## 0.6.13 - 2026-06-22
+## 0.6.18 - 2026-06-22
 
 小程序支付补充支付宝小程序接入：
 
-- `收单/小程序支付.md`：开通产品表新增支付宝线上/线下产品码；接入步骤补充支付宝 authCode 换取 userId 与唤起收银台参考链接；前端示例新增支付宝授权码获取与 `my.tradePay` 唤起示例。
+- `产品能力/收单/小程序支付.md`：开通产品表新增支付宝线上/线下产品码；接入步骤补充支付宝 authCode 换取 userId 与唤起收银台参考链接；前端示例新增支付宝授权码获取与 `my.tradePay` 唤起示例。
+
+## 0.6.17 - 2026-06-16
+
+脚本目录归类：
+
+- `common/response_verify.py`：跨 RSA/SM2 应答验签库
+- `tools/verify_vectors.py`、`tools/verify_response.py`：跨算法 CLI
+- 根目录仅保留 `validate_docs.py` 发版入口
+
+## 0.6.16 - 2026-06-16
+
+环境变量命名调整（不保留旧名）：
+
+- `YOP_YOP_PUBLIC_KEY` → `YOP_PLATFORM_PUBLIC_KEY`
+- `YOP_YOP_PRIVATE_KEY` → `YOP_PLATFORM_PRIVATE_KEY`
+
+## 0.6.15 - 2026-06-16
+
+API 应答验签：
+
+- 新增应答验签模块（RSA SHA256 / SM2 SM3，与 Java SDK 对齐）及 CLI `tools/verify_response.py`。
+- `rsa/client.py`、`sm/client.py` 支持 `call(..., verify=True)`；`query_order.py` 支持 `--verify`。
+- `请求签名协议.md` 补充应答验签章节；新增应答验签测试向量。
+
+## 0.6.14 - 2026-06-16
+
+平台商密证书文档合并与归位：
+
+- 将密钥管理下两篇平台商密证书文档合并为 `平台规范/安全认证/平台商密证书.md`。
+- 更新 manifest、密钥管理交叉引用及 `报文加密机制(SM).md` 内链。
+
+## 0.6.13 - 2026-06-16
+
+平台商密证书文档与查询脚本：
+
+- 新增平台商密证书文档（整理自在线文档 3862 / 2479；0.6.14 起合并为 `平台规范/安全认证/平台商密证书.md`）。
+- 新增 `scripts/sm/list_platform_certs.py`：SM2 鉴权调用 `GET /rest/v2.0/yop/platform/certs`，表格展示序列号与有效期，支持 `--save-dir` 落盘 PEM 并导出公钥。
+- 更新 manifest、密钥管理交叉引用及 SKILL 工具表。
 
 ## 0.6.12 - 2026-06-16
 

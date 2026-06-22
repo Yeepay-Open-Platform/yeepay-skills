@@ -10,10 +10,11 @@ pip install -r ../requirements.txt
 
 | 脚本 | 用途 | 依据文档 |
 |------|------|----------|
-| `client.py` | YOP SM2/SM3 鉴权客户端 | `安全认证/鉴权认证机制(SM).md` |
+| `client.py` | YOP SM2/SM3 鉴权客户端（`call(verify=True)` 可验签应答） | `安全认证/鉴权认证机制(SM).md` |
 | `gen_keypair.py` | 生成 SM2 密钥对（PKCS8/SPKI PEM） | `密钥介绍.md` |
 | `mock_notify.py` | 模拟 SM2 结果通知 | `安全认证/结果通知(SM2).md` |
 | `decrypt_notify.py` | SM2 回调解密验签 | `安全认证/结果通知(SM2).md` |
+| `list_platform_certs.py` | 查询平台 SM2 证书列表（V2） | `平台规范/安全认证/平台商密证书.md` |
 | `notify_crypto.py` | 回调编解码（内部模块） | `回调解密协议.md`（SM2 章节） |
 | `crypto.py` | SM2/SM3/SM4 国密原语（内部模块） | `鉴权认证机制(SM).md` |
 
@@ -47,6 +48,12 @@ python sm/decrypt_notify.py \
   --body '...' \
   --merchant-key ./keys/sm2_merchant_private_pkcs8.pem \
   --yop-pubkey ./keys/sm2_yop_public.pem
+
+# 查询平台商密证书（须已配置 CFCA 商密私钥）
+python sm/list_platform_certs.py \
+  --appkey 你的appKey \
+  --key ./keys/sm2_private_pkcs8.pem \
+  --save-dir ./certs/yop
 ```
 
 ## 测试向量（tests/vectors/）
@@ -54,7 +61,7 @@ python sm/decrypt_notify.py \
 SM2 签名/回调向量与 RSA 向量分开存放。校验入口仍在根目录：
 
 ```bash
-python verify_vectors.py
+python tools/verify_vectors.py
 ```
 
-协议实现变更时：`python verify_vectors.py --regen` → 同步协议文档示例 → 提升 Skill 版本。
+协议实现变更时：`python tools/verify_vectors.py --regen` → 同步协议文档示例 → 提升 Skill 版本。

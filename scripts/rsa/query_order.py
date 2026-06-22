@@ -37,6 +37,8 @@ def main():
     p.add_argument("--order-id", required=True, help="商户收款请求号 orderId")
     p.add_argument("--unique-order-no", help="易宝订单号 uniqueOrderNo（可选）")
     p.add_argument("--base-url", default=yop_client.DEFAULT_OPENAPI)
+    p.add_argument("--verify", action="store_true", help="验签平台应答（须 --yop-pubkey）")
+    p.add_argument("--yop-pubkey", default=os.getenv("YOP_PLATFORM_PUBLIC_KEY"), help="易宝 RSA 公钥 PEM")
     args = p.parse_args()
 
     if not (args.appkey and args.key and args.merchant):
@@ -54,6 +56,7 @@ def main():
     resp = yop_client.call(
         args.appkey, private_key, "GET",
         "/rest/v1.0/trade/order/query", params=params, base_url=args.base_url,
+        verify=args.verify, yop_pubkey=args.yop_pubkey,
     )
     _print_resp(resp)
 
@@ -66,7 +69,9 @@ def _read_key(key: str) -> str:
 
 
 def _print_resp(resp):
-    print(f"HTTP {resp.status_code}  request-id={resp.headers.get('x-yop-request-id')}")
+    verified = getattr(resp, "yop_sign_verified", False)
+    flag = "  [应答验签通过]" if verified else ""
+    print(f"HTTP {resp.status_code}  request-id={resp.headers.get('x-yop-request-id')}{flag}")
     try:
         print(json.dumps(resp.json(), ensure_ascii=False, indent=2))
     except ValueError:

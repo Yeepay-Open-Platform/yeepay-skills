@@ -27,7 +27,7 @@ def main():
     p.add_argument("--cipher-file", help="从文件读取密文")
     p.add_argument("--merchant-key", default=os.getenv("YOP_PRIVATE_KEY"),
                      help="商户私钥（解随机密钥）")
-    p.add_argument("--yop-pubkey", default=os.getenv("YOP_YOP_PUBLIC_KEY"),
+    p.add_argument("--yop-pubkey", default=os.getenv("YOP_PLATFORM_PUBLIC_KEY"),
                      help="易宝公钥（验签）")
     args = p.parse_args()
 

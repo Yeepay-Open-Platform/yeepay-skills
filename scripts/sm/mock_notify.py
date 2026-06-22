@@ -35,7 +35,7 @@ def main():
     p.add_argument("--mode", choices=["simple", "real"], default="real",
                    help="real=SM2/SM4 密文（可互打验证）；simple 仅 JSON 明文")
     p.add_argument("--url", required=True, help="商户回调 notifyUrl")
-    p.add_argument("--yop-key", default=os.getenv("YOP_YOP_PRIVATE_KEY"),
+    p.add_argument("--yop-key", default=os.getenv("YOP_PLATFORM_PRIVATE_KEY"),
                    help="易宝侧 SM2 私钥 PEM（模拟平台签名）")
     p.add_argument("--merchant-pubkey", default=os.getenv("YOP_MERCHANT_PUBLIC_KEY"),
                    help="商户 SM2 公钥 PEM（加密 SM4 密钥）")

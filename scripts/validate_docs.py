@@ -155,7 +155,7 @@ def check_vectors() -> list[str]:
     """脚本实现与向量一致 + 协议文档「完整示例」与向量一致。"""
     issues: list[str] = []
     proc = subprocess.run(
-        [sys.executable, str(SCRIPTS_DIR / "verify_vectors.py")],
+        [sys.executable, str(SCRIPTS_DIR / "tools" / "verify_vectors.py")],
         capture_output=True, text=True,
     )
     if proc.returncode != 0:

@@ -9,7 +9,7 @@ description: >-
   "结算"、"提现"、"对账单"时，或咨询验签失败、回调收不到、查单、错误码排查、沙箱联调、上线检查等
   问题时使用此 Skill。
 disable-model-invocation: true
-version: 0.6.13
+version: 0.6.18
 ---
 
 # 易宝支付接入技能（统一入口）
@@ -211,8 +211,8 @@ doc_md「示例代码」节为**自动生成的全参数模板**（含脏占位�
 
 | 用途 | 脚本 |
 |------|------|
-| RSA 联调（密钥/查单/退款/回调） | `scripts/rsa/`（见 `scripts/rsa/README.md`） |
-| 国密 SM2（密钥/签名/回调） | `scripts/sm/`（见 `scripts/sm/README.md`） |
+| RSA 联调（密钥/查单/退款/回调/应答验签） | `scripts/rsa/`；应答验签 `scripts/common/response_verify.py` |
+| 国密 SM2（密钥/签名/回调/平台证书/应答验签） | `scripts/sm/`；跨算法工具 `scripts/tools/`（向量校验、离线应答验签） |
 
 > 运行任何脚本前须完成面客纪律 ②③④；仅用于联调，生产走商户自有系统。详见 `scripts/README.md`。
 

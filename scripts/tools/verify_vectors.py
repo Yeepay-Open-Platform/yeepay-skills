@@ -1,25 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""签名/回调解密测试向量的生成与校验。
+"""签名/回调解密/应答验签测试向量的生成与校验。
 
-用途：
-  1. 校验（默认）：用 rsa/tests/vectors/ 与 sm/tests/vectors/ 中的固定输入重新计算签名、解密固定密文，
-     与向量文件中的期望输出逐项比对——保证协议文档中的示例与脚本实现不漂移。
-  2. 重新生成（--regen）：协议实现变更时重算向量并回写 JSON；
-     重算后必须同步更新协议文档中的「完整示例」并提升 Skill 版本。
+在 scripts/ 目录下执行：
+    python tools/verify_vectors.py
+    python tools/verify_vectors.py --regen
 
 测试密钥仅供本向量使用，禁止用于任何真实环境。
 """
 
 import argparse
-import base64
 import json
 import sys
 from pathlib import Path
 
+_SCRIPTS_DIR = Path(__file__).resolve().parent.parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
+from common.response_verify import (
+    sign_rsa_response,
+    sign_sm2_response,
+    verify_rsa_response,
+    verify_sm2_response,
+)
 from rsa import client as rsa_client
 from rsa import notify_crypto as rsa_notify_crypto
 from sm import client as sm_client
@@ -32,7 +39,7 @@ from sm.crypto import (
     load_sm2_public,
 )
 
-SCRIPTS_DIR = Path(__file__).resolve().parent
+SCRIPTS_DIR = _SCRIPTS_DIR
 RSA_VECTOR_DIR = SCRIPTS_DIR / "rsa" / "tests" / "vectors"
 SM_VECTOR_DIR = SCRIPTS_DIR / "sm" / "tests" / "vectors"
 
@@ -42,6 +49,7 @@ YOP_PRIVATE = RSA_VECTOR_DIR / "test_yop_private.pem"
 YOP_PUBLIC = RSA_VECTOR_DIR / "test_yop_public.pem"
 SIGN_VECTORS = RSA_VECTOR_DIR / "sign_vectors.json"
 NOTIFY_VECTOR = RSA_VECTOR_DIR / "notify_vector.json"
+RESPONSE_VECTOR = RSA_VECTOR_DIR / "response_vector.json"
 
 MERCHANT_SM2_PRIVATE = SM_VECTOR_DIR / "test_merchant_sm2_private.pem"
 MERCHANT_SM2_PUBLIC = SM_VECTOR_DIR / "test_merchant_sm2_public.pem"
@@ -49,6 +57,7 @@ YOP_SM2_PRIVATE = SM_VECTOR_DIR / "test_yop_sm2_private.pem"
 YOP_SM2_PUBLIC = SM_VECTOR_DIR / "test_yop_sm2_public.pem"
 SIGN_SM_VECTORS = SM_VECTOR_DIR / "sign_sm_vectors.json"
 NOTIFY_SM_VECTOR = SM_VECTOR_DIR / "notify_sm_vector.json"
+RESPONSE_SM_VECTOR = SM_VECTOR_DIR / "response_sm_vector.json"
 
 # ---- 固定输入（修改即破坏向量，须 --regen 并同步文档） ----
 
@@ -116,6 +125,14 @@ NOTIFY_SM_APP_KEY = APP_KEY
 NOTIFY_SM_REQUEST_ID = "00000000-0000-4000-8000-000000000002"
 NOTIFY_SM_TIMESTAMP = "2026-01-01T00:00:00Z"
 NOTIFY_SM_URI = "/notify/sm-vector"
+
+RESPONSE_BODY = (
+    '{\n'
+    '  "state": "SUCCESS",\n'
+    '  "result": {"orderId": "TEST_ORDER_20260101_001"}\n'
+    '}'
+)
+RESPONSE_SM_SIGN_RANDOM = "b" * 64
 
 
 def _gen_keypair(private_path: Path, public_path: Path) -> None:
@@ -205,6 +222,13 @@ def regen() -> None:
     NOTIFY_VECTOR.write_text(
         json.dumps(notify_vector, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
+    response_vector = {
+        "body": RESPONSE_BODY,
+        "signature": sign_rsa_response(RESPONSE_BODY, yop_priv),
+    }
+    RESPONSE_VECTOR.write_text(
+        json.dumps(response_vector, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
     SM_VECTOR_DIR.mkdir(parents=True, exist_ok=True)
     _ensure_sm2_keypair(MERCHANT_SM2_PRIVATE, MERCHANT_SM2_PUBLIC)
     _ensure_sm2_keypair(YOP_SM2_PRIVATE, YOP_SM2_PUBLIC)
@@ -250,16 +274,27 @@ def regen() -> None:
     NOTIFY_SM_VECTOR.write_text(
         json.dumps(notify_sm_vector, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    print(f"[regen] 已写入 {SIGN_VECTORS.name} / {NOTIFY_VECTOR.name}")
-    print(f"[regen] 已写入 {SIGN_SM_VECTORS.name} / {NOTIFY_SM_VECTOR.name}")
+    response_sm_vector = {
+        "body": RESPONSE_BODY,
+        "signature": sign_sm2_response(
+            RESPONSE_BODY, yop_sm2_priv, random_hex=RESPONSE_SM_SIGN_RANDOM,
+        ),
+        "sign_random_hex": RESPONSE_SM_SIGN_RANDOM,
+    }
+    RESPONSE_SM_VECTOR.write_text(
+        json.dumps(response_sm_vector, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    print(f"[regen] 已写入 {SIGN_VECTORS.name} / {NOTIFY_VECTOR.name} / {RESPONSE_VECTOR.name}")
+    print(f"[regen] 已写入 {SIGN_SM_VECTORS.name} / {NOTIFY_SM_VECTOR.name} / {RESPONSE_SM_VECTOR.name}")
     print("[regen] 请同步更新 请求签名协议.md / 回调解密协议.md 的「完整示例」并提升 Skill 版本")
 
 
 def verify() -> list[str]:
     errors: list[str] = []
-    for f in (MERCHANT_PRIVATE, YOP_PUBLIC, SIGN_VECTORS, NOTIFY_VECTOR):
+    regen_hint = "先运行 python tools/verify_vectors.py --regen"
+    for f in (MERCHANT_PRIVATE, YOP_PUBLIC, SIGN_VECTORS, NOTIFY_VECTOR, RESPONSE_VECTOR):
         if not f.exists():
-            return [f"缺少向量文件：{f}（先运行 verify_vectors.py --regen）"]
+            return [f"缺少向量文件：{f}（{regen_hint}）"]
 
     merchant_pem = MERCHANT_PRIVATE.read_text()
     sign_vectors = json.loads(SIGN_VECTORS.read_text(encoding="utf-8"))
@@ -282,7 +317,6 @@ def verify() -> list[str]:
     except ValueError as e:
         errors.append(f"回调向量解密失败：{e}")
 
-    # AES 随机密钥固定时密文应可整体复现
     yop_priv = rsa_notify_crypto.load_key(str(YOP_PRIVATE), "private")
     merchant_pub = rsa_notify_crypto.load_key(str(MERCHANT_PUBLIC), "public")
     rebuilt = rsa_notify_crypto.encrypt_notify(
@@ -293,12 +327,26 @@ def verify() -> list[str]:
     if enc_data_actual != enc_data_expect:
         errors.append("回调向量不匹配：encData 段不可复现（AES/签名实现变更？）")
 
+    response_vector = json.loads(RESPONSE_VECTOR.read_text(encoding="utf-8"))
+    try:
+        verify_rsa_response(
+            response_vector["body"],
+            response_vector["signature"],
+            yop_pub,
+        )
+    except Exception as e:
+        errors.append(f"RSA 应答验签向量失败：{e}")
+    rebuilt_sig = sign_rsa_response(response_vector["body"], yop_priv)
+    if rebuilt_sig != response_vector["signature"]:
+        errors.append("RSA 应答签名向量不可复现")
+
     sm_files = (
         MERCHANT_SM2_PRIVATE, YOP_SM2_PUBLIC, SIGN_SM_VECTORS, NOTIFY_SM_VECTOR,
+        RESPONSE_SM_VECTOR,
     )
     for f in sm_files:
         if not f.exists():
-            errors.append(f"缺少 SM2 向量文件：{f}（先运行 verify_vectors.py --regen）")
+            errors.append(f"缺少 SM2 向量文件：{f}（{regen_hint}）")
             return errors
 
     sign_sm_vectors = json.loads(SIGN_SM_VECTORS.read_text(encoding="utf-8"))
@@ -325,6 +373,24 @@ def verify() -> list[str]:
             errors.append("SM2 回调向量不匹配：解密明文与期望不一致")
     except ValueError as e:
         errors.append(f"SM2 回调向量解密失败：{e}")
+
+    response_sm_vector = json.loads(RESPONSE_SM_VECTOR.read_text(encoding="utf-8"))
+    yop_sm2_pub = load_sm2_public(str(YOP_SM2_PUBLIC))
+    yop_sm2_priv = load_sm2_private(str(YOP_SM2_PRIVATE))
+    try:
+        verify_sm2_response(
+            response_sm_vector["body"],
+            response_sm_vector["signature"],
+            yop_sm2_pub,
+        )
+    except Exception as e:
+        errors.append(f"SM2 应答验签向量失败：{e}")
+    rand = response_sm_vector.get("sign_random_hex", RESPONSE_SM_SIGN_RANDOM)
+    rebuilt_sm_sig = sign_sm2_response(
+        response_sm_vector["body"], yop_sm2_priv, random_hex=rand,
+    )
+    if rebuilt_sm_sig != response_sm_vector["signature"]:
+        errors.append("SM2 应答签名向量不可复现")
 
     return errors
 

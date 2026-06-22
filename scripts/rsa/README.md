@@ -10,7 +10,7 @@ pip install -r ../requirements.txt
 
 | 脚本 | 用途 | 依据文档 |
 |------|------|----------|
-| `client.py` | YOP RSA 鉴权客户端（被 query/refund 复用） | `安全认证/鉴权认证机制(RSA).md`、`安全认证/请求签名协议.md` |
+| `client.py` | YOP RSA 鉴权客户端（`call(verify=True)` 可验签应答） | `安全认证/鉴权认证机制(RSA).md`、`安全认证/请求签名协议.md` |
 | `gen_keypair.py` | 生成 RSA2048 密钥对 | `密钥介绍.md` |
 | `query_order.py` | 查单 | doc_md + api-index.yaml |
 | `refund.py` | 退款申请/查询 | doc_md + api-index.yaml |
@@ -35,7 +35,8 @@ python rsa/gen_keypair.py --out ./keys
 
 # 查单
 python rsa/query_order.py --appkey app_100xxx --key ./keys/rsa_private_pkcs8.pem \
-  --merchant 100xxx --order-id ORDER_xxx
+  --merchant 100xxx --order-id ORDER_xxx \
+  --verify --yop-pubkey ./keys/yop_public.pem
 
 # 真实密文互打验证
 python rsa/mock_notify.py --mode real --dry-run \
@@ -53,7 +54,7 @@ python rsa/decrypt_notify.py --cipher '...' \
 RSA 签名/回调向量与国密向量分开存放。校验入口在根目录：
 
 ```bash
-python verify_vectors.py
+python tools/verify_vectors.py
 ```
 
-协议实现变更时：`python verify_vectors.py --regen` → 同步协议文档示例 → 提升 Skill 版本。
+协议实现变更时：`python tools/verify_vectors.py --regen` → 同步协议文档示例 → 提升 Skill 版本。

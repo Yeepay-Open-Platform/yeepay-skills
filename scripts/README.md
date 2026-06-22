@@ -12,9 +12,13 @@ pip install -r requirements.txt
 
 ```text
 scripts/
-├── validate_docs.py      # 发版守门
-├── verify_vectors.py     # RSA + SM2 测试向量校验
+├── validate_docs.py      # Skill 发版守门（文档 + 向量 + 版本）
 ├── requirements.txt
+├── common/               # 跨算法共享库
+│   └── response_verify.py   # API 应答验签（RSA/SM2）
+├── tools/                # 跨算法 CLI（见 tools/README.md）
+│   ├── verify_vectors.py    # 测试向量校验 / --regen
+│   └── verify_response.py # 离线应答验签
 ├── rsa/                  # RSA 联调（见 rsa/README.md）
 └── sm/                   # 国密 SM2 联调（见 sm/README.md）
 ```
@@ -32,17 +36,19 @@ python validate_docs.py --with-notify-test   # 额外含 RSA + SM2 mock/decrypt 
 |------|------|
 | `YOP_APPKEY` | 应用 appKey |
 | `YOP_PRIVATE_KEY` | 商户私钥（查单/退款/simple mock） |
-| `YOP_YOP_PRIVATE_KEY` | 模拟平台签名私钥（real mock） |
+| `YOP_PLATFORM_PRIVATE_KEY` | 易宝平台私钥（real mock 模拟平台签名） |
 | `YOP_MERCHANT_PUBLIC_KEY` | 商户公钥（real mock 加密） |
-| `YOP_YOP_PUBLIC_KEY` | 易宝公钥（decrypt_notify 验签） |
+| `YOP_PLATFORM_PUBLIC_KEY` | 易宝平台公钥（应答/回调验签） |
 | `YOP_MERCHANT_NO` | 商户编号 |
 
 ## 快速入口
 
 | 算法 | 密钥生成 | 出站签名/查单 | 回调互打 |
 |------|----------|---------------|----------|
-| RSA | `python rsa/gen_keypair.py` | `rsa/query_order.py`、`rsa/refund.py` | `rsa/mock_notify.py` + `rsa/decrypt_notify.py` |
-| SM2 | `python sm/gen_keypair.py` | `sm/client.py` | `sm/mock_notify.py` + `sm/decrypt_notify.py` |
+| RSA | `python rsa/gen_keypair.py` | `rsa/query_order.py`、`rsa/refund.py`（`--verify` 验签应答） | `rsa/mock_notify.py` + `rsa/decrypt_notify.py` |
+| SM2 | `python sm/gen_keypair.py` | `sm/client.py`、`sm/list_platform_certs.py`（`call(verify=True)`） | `sm/mock_notify.py` + `sm/decrypt_notify.py` |
+
+跨算法工具：`python tools/verify_vectors.py`、`python tools/verify_response.py --algo rsa|sm2 ...`
 
 > 协议文档位于 `../references/平台文档/平台规范/安全认证/`。
 
@@ -52,7 +58,7 @@ python validate_docs.py --with-notify-test   # 额外含 RSA + SM2 mock/decrypt 
 - SM2：`sm/tests/vectors/`
 
 固定测试密钥与签名/回调解密的输入输出期望值，供商户自研实现逐字节比对。
-协议实现变更时：`python verify_vectors.py --regen` 重算 → 同步协议文档示例 → 提升 Skill 版本。
+协议实现变更时：`python tools/verify_vectors.py --regen` 重算 → 同步协议文档示例 → 提升 Skill 版本。
 **测试密钥仅供向量使用，禁止用于任何真实环境。**
 
 ## 重要约定

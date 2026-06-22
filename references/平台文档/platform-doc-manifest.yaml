@@ -2,7 +2,7 @@
 # Agent 查平台规则时优先读本目录；接口字段仍以在线 doc_md 为准。
 
 # 版本以 SKILL.md frontmatter 为准（单一来源）；本字段由发版时同步，validate_docs.py 校验一致性。
-version: "0.6.13"
+version: "0.6.18"
 
 sections:
   - name: 接入准备
@@ -64,6 +64,10 @@ sections:
         title: 鉴权认证机制（RSA）
       - path: 平台规范/安全认证/鉴权认证机制(SM).md
         title: 鉴权认证机制（SM）
+      - path: 平台规范/安全认证/平台商密证书.md
+        title: 平台商密证书
+        topics: [SM2, 平台证书, 轮换, certs, x-yop-sign-serial-no]
+        related: [平台规范/安全认证/结果通知(SM2).md, 平台规范/安全认证/报文加密机制(SM).md]
       - path: 平台规范/安全认证/报文加密机制(RSA).md
         title: 报文加密机制（RSA）
       - path: 平台规范/安全认证/报文加密机制(SM).md

@@ -64,7 +64,7 @@ def main():
     p.add_argument("--url", required=True, help="商户回调 notifyUrl")
     p.add_argument("--key", default=os.getenv("YOP_PRIVATE_KEY"),
                    help="[simple] 签名私钥")
-    p.add_argument("--yop-key", default=os.getenv("YOP_YOP_PRIVATE_KEY"),
+    p.add_argument("--yop-key", default=os.getenv("YOP_PLATFORM_PRIVATE_KEY"),
                    help="[real] 易宝侧私钥（模拟平台签名）")
     p.add_argument("--merchant-pubkey", default=os.getenv("YOP_MERCHANT_PUBLIC_KEY"),
                    help="[real] 商户公钥（加密随机密钥）")

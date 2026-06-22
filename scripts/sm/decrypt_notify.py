@@ -43,7 +43,7 @@ def main():
     p.add_argument("--body-file", help="从文件读取 body")
     p.add_argument("--merchant-key", default=os.getenv("YOP_PRIVATE_KEY"),
                    help="商户 SM2 私钥 PEM 或 PKCS8 base64")
-    p.add_argument("--yop-pubkey", default=os.getenv("YOP_YOP_PUBLIC_KEY"),
+    p.add_argument("--yop-pubkey", default=os.getenv("YOP_PLATFORM_PUBLIC_KEY"),
                    help="易宝 SM2 公钥 PEM 或 SPKI base64")
     args = p.parse_args()
 

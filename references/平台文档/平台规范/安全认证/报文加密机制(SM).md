@@ -19,7 +19,7 @@
 
 **{YOP加密协议版本}**：目前YOP的加密协议版本号为`yop-encrypt-v1`
 
-**{平台证书序列号}**：用于加密SM4密钥的平台商密证书的序列号，获取平台商密证书详情见 [获取平台商密证书列表](https://open.yeepay.com/docs-v3/platform/2479.md)
+**{平台证书序列号}**：用于加密SM4密钥的平台商密证书的序列号，获取方式见 `平台商密证书.md`
 
 **{密钥类型}`_`{分组模式}`_`{填充算法}**：目前可选`SM4_CBC_PKCS5Padding`
 
@@ -86,7 +86,7 @@ String encryptedJsonRequest = "C3UTRPenhJfxJh2M5Dzy_aqWumu9gHa2NXblArC3trzhMS6KT
 
 ### [](https://open.yeepay.com/docs-v3/platform/14024.md#%E4%BD%BF%E7%94%A8%E5%B9%B3%E5%8F%B0sm2%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86sm4%E5%AF%86%E9%92%A5)使用平台SM2公钥加密SM4密钥
 
-若要获取平台SM2公钥，详见[获取平台商密证书列表](https://open.yeepay.com/docs-v3/platform/2479.md)。
+若要获取平台 SM2 公钥，详见 `平台商密证书.md`。
 
 加密过程具体可参考源码中的 [YopSm2Encryptor](https://github.com/yop-platform/yop-java-sdk/blob/develop/yop-java-sdk-crypto-gm/src/main/java/com/yeepay/yop/sdk/gm/security/encrypt/YopSm2Encryptor.java)。 注：构建 SM2Engine 的 mode 设置为`SM2Engine.Mode.C1C3C2`
 

@@ -80,7 +80,7 @@ yeepay-pay-skill-v0.4/
 | 平台接口新增/变更 | `references/产品能力/api-index.yaml`（doc_md / api_id / path） | 不在场景 md 内置字段表 |
 | 平台规范变更（签名/回调/密钥） | `references/平台文档/`，协议变更同步 `scripts/` 与测试向量 | — |
 | 产品流程/易错点变更 | `references/产品能力/<域>/<场景>.md` | — |
-| 协议实现变更 | `scripts/` + `scripts/verify_vectors.py --regen` 重算向量 + 同步协议文档「完整示例」 | — |
+| 协议实现变更 | `scripts/tools/verify_vectors.py --regen` 重算向量 + 同步协议文档「完整示例」 | — |
 
 ### 发版流程
 
