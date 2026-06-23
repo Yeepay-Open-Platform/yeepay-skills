@@ -160,6 +160,7 @@ def _compute_sign_case(case: dict, merchant_pem: str) -> dict:
         "authorization": req["headers"]["Authorization"],
         "body": req["body"],
         "url": req["url"],
+        "content_type": req.get("content_type"),
     }
 
 
@@ -184,6 +185,7 @@ def _compute_sm_sign_case(case: dict, merchant_priv_pem: str) -> dict:
         "authorization": req["headers"]["Authorization"],
         "body": req["body"],
         "url": req["url"],
+        "content_type": req.get("content_type"),
     }
 
 

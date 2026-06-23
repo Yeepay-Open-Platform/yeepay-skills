@@ -2,7 +2,7 @@
 # Agent 查平台规则时优先读本目录；接口字段仍以在线 doc_md 为准。
 
 # 版本以 SKILL.md frontmatter 为准（单一来源）；本字段由发版时同步，validate_docs.py 校验一致性。
-version: "0.6.21"
+version: "0.6.22"
 
 sections:
   - name: 接入准备

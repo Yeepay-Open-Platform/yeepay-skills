@@ -2,6 +2,14 @@
 
 版本规则与发版流程见 `README.md`「版本管理与更新机制」。最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
 
+## 0.6.22 - 2026-06-23
+
+出站签名与 HTTP 报文编码规范化（不含文件上传/下载，后续支持）：
+
+- 新增 `common/url_encoding.py`：签名一次编码（空格 `%20`）与 HTTP 报文二次编码（`http_form_body` / `http_query_string`）
+- 新增 `common/yop_content_type.py`、`common/yop_http.py`：Content-Type 规范传递；GET/POST Form 统一 `application/x-www-form-urlencoded;charset=UTF-8`，**不参与签名**
+- `rsa/client.py`、`sm/client.py` 对齐上述规则；测试向量与 `请求签名协议.md` 同步更新
+
 ## 0.6.21 - 2026-06-22
 
 出站请求补充 SDK 标准头：
