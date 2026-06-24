@@ -1,90 +1,105 @@
 # 易宝支付接入技能
 
-> 当前版本以 `SKILL.md` frontmatter 的 `version` 为唯一来源；变更历史见 `CHANGELOG.md`。
+> 面向 Cursor Agent 的易宝支付（Yeepay / YOP）接入、联调与排障技能。当前版本以 `SKILL.md` frontmatter 的 `version` 为唯一来源；变更历史见 `CHANGELOG.md`。
 
-面向 Agent 的易宝支付（Yeepay）接入与联调排障技能。覆盖**收单 / 退款 / 分账 / 出款 / 对账**全业务域，
-内置签名验签、回调验签、幂等重试、查单纪律，并提供产品决策、场景流程、工具脚本与代码示例。
+## 这是什么
 
-## 设计原则
+这是一个面向商户接入场景的 Agent Skill。用户提到「接入易宝」「YOP」「小程序支付」「APP 支付」「退款」「分账」「提现」「对账」「验签失败」「回调收不到」等问题时，Agent 会按 `SKILL.md` 的面客纪律、产品决策和文档加载协议来协助完成：
 
-- **单一入口**：唯一 `SKILL.md` 负责路由与纪律，不再有多个子技能 `SKILL.md`。
-- **API 走在线**：接口字段/错误码不内置静态文档，统一由 `references/产品能力/api-index.yaml`
-  维护 `doc_md` 在线文档链接，Agent 按「文档加载协议」用 `curl` 实时拉取，保证字段永远最新。
-- **产品能力维度组织**：业务文档按「产品能力 / 业务域 / 场景」展开，每个场景一个 md，
-  只写流程、易错点与引用（API 走 catalog、代码走示例代码、规则走平台文档）。
-- **平台文档本地权威**：签名、加密、回调机制、接入准备、错误码等稳定规则本地保留，不走 curl。
+- 产品选型：先判断业务场景，再推荐收单、退款、分账、出款或对账能力。
+- 接入指导：按场景 md 输出流程、前置条件、易错点和接口定位。
+- 代码实现：按 SDK / 非 SDK 路径生成参数表或示例代码。
+- 联调排障：围绕签名、回调、查单、错误码、证书、IP 白名单等定位问题。
+- 本地验证：用 `scripts/` 下工具做签名、回调、应答验签和测试向量校验。
+
+## 覆盖范围
+
+| 业务域 | 覆盖内容 |
+|--------|----------|
+| 收单 | 小程序支付、APP 支付、浏览器 H5、微信内 H5+公众号、被扫付款码、主扫独立码/聚合码、prePayTn 唤起方式 |
+| 退款 | 申请退款、退款查询、退款回调与排障 |
+| 分账 | 订单分账、余额分账、入账方相关流程 |
+| 出款 | 结算、提现、提现卡、account/balance 分组 CFCA 证书约束 |
+| 对账 | 交易、分账、资金、结算对账 |
+| 运维排障 | 签名验签、回调验签、YOP 错误码、沙箱联调、上线检查 |
+
+需求不在上述范围内时，Agent 应使用 `references/产品能力/产品决策.md` 的「超出产品能力范围」模板回复，不臆造方案。
+
+## 交互原则
+
+- **先听懂场景，再给接口和代码**：场景不明确时先用商户能听懂的话澄清，不直接堆参数。
+- **需求明确可走快速通道**：用户已说明场景、语言、环境时，可以合并澄清步骤，直接进入实现。
+- **生产环境必须二次确认**：任何指向生产环境的实际接口调用，必须单独获得用户显式确认；未确认时只输出方案、命令或按沙箱处理。
+- **终态以回调 + 查单为准**：前端成功页不是交易终态，支付、退款、出款等都要结合异步通知和查询结果判断。
+- **不泄露敏感信息**：不输出私钥、完整密钥、完整卡号或完整证件号。
+
+## 技术纪律
+
+- **接口字段走在线文档**：字段、错误码、示例代码骨架以 `doc_md` 为准；实现前必须按 `references/产品能力/api-index.yaml` 定位并 `curl` 在线 markdown。
+- **平台规则走本地权威**：签名、加密、回调、密钥、SDK、IP 白名单、上线检查等稳定规则以 `references/平台文档/` 为准。
+- **L1 / L2 / L3 分层**：
+  - L1：不使用 SDK，自研签名、加解密、回调解析。
+  - L2 / L2'：使用官方 SDK（Java / 其他语言）。
+  - L3：所有路径共用的接口在线 `doc_md`，用于字段、错误码与调用骨架。
+- **脚本仅用于联调和本地验证**：生产调用仍必须走商户自有系统和生产二次确认。
 
 ## 目录结构
 
 ```text
-yeepay-pay-skill-v0.4/
-├── README.md                         本文件
+yeepay-pay-skill/
+├── README.md                         面向使用者的说明
+├── CHANGELOG.md                      变更历史
 ├── LICENSE.md
-├── SKILL.md                          唯一入口：路由 + 纪律 + 文档加载协议
-├── scripts/                          Python 工具
-│   ├── gen_keypair.py                生成密钥对（RSA/SM2）
-│   ├── query_order.py                查单
-│   ├── refund.py                     退款
-│   └── mock_notify.py                本地模拟发结果通知
+├── SKILL.md                          唯一入口：面客纪律、技术执行顺序、路由、输出模板
+├── scripts/                          Python 联调工具（仅本地）
+│   ├── README.md
+│   ├── requirements.txt
+│   ├── validate_docs.py              发版守门：死链、版本一致、测试向量等
+│   ├── common/                       跨算法共用：YOP 标准头、URL 编码、应答验签
+│   ├── rsa/                          RSA 密钥、客户端、查单、退款、回调与测试向量
+│   ├── sm/                           国密 SM2 密钥、客户端、平台证书、回调与测试向量
+│   └── tools/                        跨算法工具：向量校验、离线应答验签
 └── references/
-    ├── 平台文档/                      本地权威（接入准备/安全认证/平台规范/工具与支持/错误码）
-    │   └── 平台规范/安全认证/          含 请求签名协议.md、回调解密协议.md（不使用 SDK 时实现参考）
     ├── 产品能力/
-    │   ├── 产品决策.md                方案与支付方式选型决策
-    │   ├── api-index.yaml            所有 API 的 curl 清单
-    │   ├── 收单/                      8 个支付场景（含前端示例代码）
-    │   ├── 退款/退款.md
-    │   ├── 分账/                      订单分账 / 余额分账
-    │   ├── 出款/                      结算 / 提现
-    │   └── 对账/                      交易 / 分账 / 资金 / 结算对账
+    │   ├── 产品决策.md               选型、关键词、澄清模板、超范围回复
+    │   ├── api-index.yaml            API catalog：doc_md / path / method / api_id
+    │   ├── 收单/                     收单场景流程、易错点、前端示例与 prePayTn 速查
+    │   ├── 退款/
+    │   ├── 分账/
+    │   ├── 出款/
+    │   └── 对账/
+    ├── 平台文档/
+    │   ├── platform-doc-manifest.yaml 平台规则导航索引（topics 定位必读文档）
+    │   ├── 接入准备/                 快速接入、应用管理、密钥管理
+    │   ├── 开始对接/                 SDK、沙箱、IP 白名单、错误码、Java SDK 报错
+    │   ├── 平台规范/                 上线检查、回调网络配置、结果通知、安全认证
+    │   └── 工具与支持/               平台 SDK、密钥工具、接入诊断、YOP-MCP、常见问题
     └── troubleshooting.md            各业务域排障汇总
 ```
 
-## 接口数据源（实测确认）
+## 文档数据源
 
-接口规格由开放平台「在线 markdown 文档」提供，产品无关，可直接 `curl`：
+| 类型 | 来源 | 用法 |
+|------|------|------|
+| 接口字段 / 错误码 / 示例代码骨架 | `https://open.yeepay.com/docs-v3/api/<slug>.md` | 从 `api-index.yaml` 取 `doc_md` 后实时 `curl` |
+| 结果通知文档 | 接口 doc_md 的「结果通知」节或 notify 文档 URL | 以接口 doc_md 为准，`api-index.yaml` 的 `notify_spi` 仅作提示 |
+| 签名 / 加密 / 回调 / SDK / 密钥 | `references/平台文档/` | 本地权威，不走在线 curl |
+| 产品流程 / 易错点 / 前端示例 | `references/产品能力/<业务域>/<场景>.md` | 场景确认后阅读 |
 
-| 用途 | URL 模板 |
-|------|----------|
-| 接口在线文档（基本信息/请求参数/请求示例/响应参数/响应示例/错误码/示例代码，单文件全含） | `https://open.yeepay.com/docs-v3/api/<slug>.md` |
-| 结果通知（SPI）文档 | `https://open.yeepay.com/docs-v3/notify/<spi>.md` |
+人类可读页 `https://open.yeepay.com/docs/products/...` 是 SPA，通常不适合用 `curl` 获取字段；实现字段以 `docs-v3` markdown 为准。
 
-> slug 规则：`<method小写>_<path去掉开头/，/ 换 _>`（保留 `.` 与 `-`）。
-> 例：`POST /rest/v2.0/aggpay/wechat-config/add` → `post_rest_v2.0_aggpay_wechat-config_add`。
-> 例外：个别接口（如 yos 账单下载类）前缀为 `options_`，以 `api-index.yaml` 中实测的 `doc_md` 为准。
->
-> 人类页 `https://open.yeepay.com/docs/products/<product>/api/<uri>` 是 SPA，curl 取不到字段，仅作链接。
+## 维护约定
 
-## 使用约定
+- 唯一版本来源为 `SKILL.md` frontmatter 的 `version`。
+- `references/产品能力/api-index.yaml` 与 `references/平台文档/platform-doc-manifest.yaml` 的 `version` 发版时需同步。
+- 平台接口新增或变更：优先改 `api-index.yaml`，不要把字段表硬写进场景 md。
+- 平台规则变更：改 `references/平台文档/`，必要时同步 `scripts/` 与测试向量。
+- 产品流程或易错点变更：改 `references/产品能力/<业务域>/<场景>.md`。
+- 协议实现变更：更新脚本、测试向量和平台协议文档。
 
-- 任何 API 字段实现前必须走 `curl`，不得凭记忆编造字段。
-- `scripts/` 仅用于联调与本地验证，不用于生产出款/交易。
-- 上线前对照 `references/troubleshooting.md` 的上线检查清单逐项确认。
+发版前建议执行：
 
-## 版本管理与更新机制
-
-### 版本号（语义化）
-
-唯一版本来源为 `SKILL.md` frontmatter 的 `version`；`api-index.yaml`、`platform-doc-manifest.yaml` 的 `version` 字段发版时同步（由 `validate_docs.py` 强制一致）。
-
-| 位 | 何时递增 | 示例 |
-|----|----------|------|
-| MAJOR | 面客纪律/路由/目录结构等不兼容调整 | 重写交互纪律 |
-| MINOR | 新增场景/接口/脚本/协议文档 | 新增一个支付场景 md |
-| PATCH | 文档勘误、措辞修订、错误码补充 | 修正易错点描述 |
-
-### 变更触发器与责任分区
-
-| 变更来源 | 改哪里 | 不要改哪里 |
-|----------|--------|------------|
-| 平台接口新增/变更 | `references/产品能力/api-index.yaml`（doc_md / api_id / path） | 不在场景 md 内置字段表 |
-| 平台规范变更（签名/回调/密钥） | `references/平台文档/`，协议变更同步 `scripts/` 与测试向量 | — |
-| 产品流程/易错点变更 | `references/产品能力/<域>/<场景>.md` | — |
-| 协议实现变更 | `scripts/tools/verify_vectors.py --regen` 重算向量 + 同步协议文档「完整示例」 | — |
-
-### 发版流程
-
-1. 完成变更，按上表归位。
-2. 跑守门：`cd scripts && python validate_docs.py --with-notify-test`（含死链/过期模式/版本一致/测试向量校验）。
-3. 提升 `SKILL.md` 的 `version`，同步两个 yaml 的 `version`。
-4. 在 `CHANGELOG.md` 顶部追加条目（版本、日期、变更要点、责任人）。
+```bash
+cd scripts
+python validate_docs.py --with-notify-test
+```

@@ -1,6 +1,13 @@
 # 变更历史
 
-版本规则与发版流程见 `README.md`「版本管理与更新机制」。最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
+版本规则与发版流程见 `README.md`「维护约定」。最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
+
+## 0.6.25 - 2026-06-24
+
+面客体验与文档导航优化：
+
+- `SKILL.md`：移除 `disable-model-invocation`，支持按 description 自动加载；澄清 L1/L2/L3 分层与步骤 5～7 关系；步骤 2 补充业务域/场景定位与模板 7 兜底；修正 `产品决策.md` 章节引用；新增快速通道与输出模板弹性说明；目录说明补全 `platform-doc-manifest.yaml` 与 `scripts/common|tools`。
+- `README.md`：按当前现状重写为面客使用说明（覆盖范围、交互原则、技术纪律、目录结构、数据源与维护约定）。
 
 ## 0.6.24 - 2026-06-23
 
