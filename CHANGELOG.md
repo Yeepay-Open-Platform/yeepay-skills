@@ -2,6 +2,14 @@
 
 版本规则与发版流程见 `README.md`「版本管理与更新机制」。最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
 
+## 0.6.24 - 2026-06-23
+
+文件上传/下载与网关路由：
+
+- 新增 `common/yop_multipart.py`、`common/yop_payload.py`、`common/yop_gateway.py`：multipart 签名、生产 yos / 沙箱 sandbox 网关解析
+- `rsa/client.py`、`sm/client.py` 新增 `upload()` / `download()`，`sandbox=True` 统一走沙箱域名
+- 生产环境文件上传与下载均走 `yos.yeepay.com/yop-center`；测试向量与 `请求签名协议.md` 同步
+
 ## 0.6.23 - 2026-06-23
 
 生产环境调用二次确认强约束：

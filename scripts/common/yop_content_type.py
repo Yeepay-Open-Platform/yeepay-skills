@@ -28,13 +28,17 @@ def resolve_content_type(
     *,
     json_body: str | None = None,
     content_type: str | None = None,
-) -> str:
+    multipart: bool = False,
+) -> str | None:
     """解析出站 Content-Type。
 
+    - multipart：不设 Content-Type（由 HTTP 客户端生成 boundary）
     - GET / POST Form → ``CONTENT_TYPE_FORM``（charset=UTF-8）
     - POST JSON → ``CONTENT_TYPE_JSON``
-    - 均仅作 HTTP 头，**不参与签名**
+    - 均不参与签名
     """
+    if multipart:
+        return None
     if content_type:
         return content_type.strip()
     if json_body is not None:

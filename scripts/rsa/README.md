@@ -10,7 +10,7 @@ pip install -r ../requirements.txt
 
 | 脚本 | 用途 | 依据文档 |
 |------|------|----------|
-| `client.py` | YOP RSA 鉴权客户端（`call(verify=True)` 可验签应答） | `安全认证/鉴权认证机制(RSA).md`、`安全认证/请求签名协议.md` |
+| `client.py` | YOP RSA 鉴权客户端（`call` / `upload` / `download`；`verify=True` 可验签应答） | `安全认证/鉴权认证机制(RSA).md`、`安全认证/请求签名协议.md` |
 | `gen_keypair.py` | 生成 RSA2048 密钥对 | `密钥介绍.md` |
 | `query_order.py` | 查单 | doc_md + api-index.yaml |
 | `refund.py` | 退款申请/查询 | doc_md + api-index.yaml |
@@ -37,6 +37,23 @@ python rsa/gen_keypair.py --out ./keys
 python rsa/query_order.py --appkey app_100xxx --key ./keys/rsa_private_pkcs8.pem \
   --merchant 100xxx --order-id ORDER_xxx \
   --verify --yop-pubkey ./keys/yop_public.pem
+
+# multipart 上传（files 可为路径或 {字段名: 路径}）
+python -c "
+from rsa import client
+resp = client.upload('app_xxx', open('keys/rsa_private_pkcs8.pem').read(),
+    '/yos/v1.0/xxx/upload', params={'merchantNo': '100xxx'},
+    files={'_file': './invoice.pdf'})
+print(resp.status_code, resp.text[:500])
+"
+
+# 文件下载（生产默认 yos；沙箱统一 sandbox 域名）
+python -c "
+from rsa import client
+client.download('app_xxx', open('keys/rsa_private_pkcs8.pem').read(),
+    '/yos/v1.0/xxx/download', params={'fileId': 'xxx'},
+    sandbox=True, save_path='./out.pdf')
+"
 
 # 真实密文互打验证
 python rsa/mock_notify.py --mode real --dry-run \

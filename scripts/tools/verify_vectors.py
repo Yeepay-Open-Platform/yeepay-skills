@@ -21,6 +21,8 @@ if str(_SCRIPTS_DIR) not in sys.path:
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
+from common.yop_gateway import resolve_gateway
+from common.yop_multipart import files_from_vector
 from common.response_verify import (
     sign_rsa_response,
     sign_sm2_response,
@@ -95,6 +97,16 @@ SIGN_CASES = [
         "json_body": '{"merchantNo":"10086032562","orderId":"TEST_ORDER_20260101_001",'
                      '"orderAmount":"0.01","goodsName":"测试商品"}',
     },
+    {
+        "name": "POST multipart 上传（content-sha256 仅非文件参数）",
+        "method": "POST",
+        "path": "/yos/v1.0/test/upload-demo",
+        "params": {"merchantNo": "10086032562", "bizType": "TEST"},
+        "files": [
+            {"field": "_file", "filename": "hello.txt", "content_b64": "SGVsbG8="},
+        ],
+        "json_body": None,
+    },
 ]
 
 NOTIFY_PLAINTEXT = (
@@ -148,10 +160,17 @@ def _gen_keypair(private_path: Path, public_path: Path) -> None:
     ))
 
 
+def _files_from_case(case: dict):
+    specs = case.get("files")
+    return files_from_vector(specs) if specs else None
+
+
 def _compute_sign_case(case: dict, merchant_pem: str) -> dict:
     req = rsa_client.build_request(
         APP_KEY, merchant_pem, case["method"], case["path"],
         params=case["params"], json_body=case["json_body"],
+        files=_files_from_case(case),
+        base_url=resolve_gateway(yos=bool(case.get("files"))),
         expire_seconds=EXPIRE_SECONDS, timestamp=TIMESTAMP, request_id=REQUEST_ID,
     )
     return {
@@ -176,6 +195,7 @@ def _compute_sm_sign_case(case: dict, merchant_priv_pem: str) -> dict:
     req = sm_client.build_request(
         APP_KEY, merchant_priv_pem, case["method"], case["path"],
         params=case["params"], json_body=case["json_body"],
+        files=_files_from_case(case),
         expire_seconds=EXPIRE_SECONDS, timestamp=TIMESTAMP, request_id=REQUEST_ID,
         sign_random_hex=SM_SIGN_RANDOM_HEX,
     )
@@ -206,6 +226,8 @@ def regen() -> None:
     }
     for case in SIGN_CASES:
         entry = {k: case[k] for k in ("name", "method", "path", "params", "json_body")}
+        if case.get("files"):
+            entry["files"] = case["files"]
         entry["expected"] = _compute_sign_case(case, merchant_pem)
         sign_vectors["cases"].append(entry)
     SIGN_VECTORS.write_text(
