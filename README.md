@@ -1,6 +1,6 @@
-# 易宝支付接入技能
+# 易宝支付接入集成技能
 
-> 面向 Cursor Agent 的易宝支付（Yeepay / YOP）接入、联调与排障技能。当前版本以 `SKILL.md` frontmatter 的 `version` 为唯一来源；变更历史见 `CHANGELOG.md`。
+> 面向 Coding Agent 的易宝支付（YeePay ）接入、联调与排障技能。当前版本以 `SKILL.md` frontmatter 的 `version` 为唯一来源；变更历史见 `CHANGELOG.md`。
 
 ## 这是什么
 
@@ -14,14 +14,16 @@
 
 ## 覆盖范围
 
-| 业务域 | 覆盖内容 |
-|--------|----------|
-| 收单 | 小程序支付、APP 支付、浏览器 H5、微信内 H5+公众号、被扫付款码、主扫独立码/聚合码、prePayTn 唤起方式 |
-| 退款 | 申请退款、退款查询、退款回调与排障 |
-| 分账 | 订单分账、余额分账、入账方相关流程 |
-| 出款 | 结算、提现、提现卡、account/balance 分组 CFCA 证书约束 |
-| 对账 | 交易、分账、资金、结算对账 |
-| 运维排障 | 签名验签、回调验签、YOP 错误码、沙箱联调、上线检查 |
+
+| 业务域  | 覆盖内容                                                         |
+| ---- | ------------------------------------------------------------ |
+| 收单   | 小程序支付、APP 支付、浏览器 H5、微信内 H5+公众号、被扫付款码、主扫独立码/聚合码、prePayTn 唤起方式 |
+| 退款   | 申请退款、退款查询、退款回调与排障                                            |
+| 分账   | 订单分账、余额分账、入账方相关流程                                            |
+| 出款   | 结算、提现、提现卡、account/balance 分组 CFCA 证书约束                       |
+| 对账   | 交易、分账、资金、结算对账                                                |
+| 运维排障 | 签名验签、回调验签、YOP 错误码、沙箱联调、上线检查                                  |
+
 
 需求不在上述范围内时，Agent 应使用 `references/产品能力/产品决策.md` 的「超出产品能力范围」模板回复，不臆造方案。
 
@@ -79,12 +81,14 @@ yeepay-pay-skill/
 
 ## 文档数据源
 
-| 类型 | 来源 | 用法 |
-|------|------|------|
-| 接口字段 / 错误码 / 示例代码骨架 | `https://open.yeepay.com/docs-v3/api/<slug>.md` | 从 `api-index.yaml` 取 `doc_md` 后实时 `curl` |
-| 结果通知文档 | 接口 doc_md 的「结果通知」节或 notify 文档 URL | 以接口 doc_md 为准，`api-index.yaml` 的 `notify_spi` 仅作提示 |
-| 签名 / 加密 / 回调 / SDK / 密钥 | `references/平台文档/` | 本地权威，不走在线 curl |
-| 产品流程 / 易错点 / 前端示例 | `references/产品能力/<业务域>/<场景>.md` | 场景确认后阅读 |
+
+| 类型                      | 来源                                              | 用法                                                 |
+| ----------------------- | ----------------------------------------------- | -------------------------------------------------- |
+| 接口字段 / 错误码 / 示例代码骨架     | `https://open.yeepay.com/docs-v3/api/<slug>.md` | 从 `api-index.yaml` 取 `doc_md` 后实时 `curl`           |
+| 结果通知文档                  | 接口 doc_md 的「结果通知」节或 notify 文档 URL               | 以接口 doc_md 为准，`api-index.yaml` 的 `notify_spi` 仅作提示 |
+| 签名 / 加密 / 回调 / SDK / 密钥 | `references/平台文档/`                              | 本地权威，不走在线 curl                                     |
+| 产品流程 / 易错点 / 前端示例       | `references/产品能力/<业务域>/<场景>.md`                 | 场景确认后阅读                                            |
+
 
 人类可读页 `https://open.yeepay.com/docs/products/...` 是 SPA，通常不适合用 `curl` 获取字段；实现字段以 `docs-v3` markdown 为准。
 
@@ -103,3 +107,4 @@ yeepay-pay-skill/
 cd scripts
 python validate_docs.py --with-notify-test
 ```
+
