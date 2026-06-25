@@ -28,6 +28,7 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
+from common.python_version import ensure_python_version
 from rsa import client as yop_client
 
 
@@ -42,6 +43,7 @@ def _common(p):
 
 
 def main():
+    ensure_python_version()
     parser = argparse.ArgumentParser(description="易宝退款")
     sub = parser.add_subparsers(dest="cmd", required=True)
 

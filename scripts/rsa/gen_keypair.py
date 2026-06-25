@@ -14,6 +14,14 @@
 
 import argparse
 import os
+import sys
+from pathlib import Path
+
+_SCRIPTS_DIR = Path(__file__).resolve().parent.parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from common.python_version import ensure_python_version
 
 
 def gen_rsa(out_dir: str):
@@ -45,6 +53,7 @@ def _write(out_dir: str, name: str, data: bytes):
 
 
 def main():
+    ensure_python_version()
     p = argparse.ArgumentParser(description="生成 RSA 密钥对")
     p.add_argument("--out", default="./keys", help="输出目录")
     args = p.parse_args()

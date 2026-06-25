@@ -21,6 +21,7 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
+from common.python_version import ensure_python_version
 from sm.crypto import export_sm2_private_pem, export_sm2_public_pem, generate_sm2_keypair
 
 
@@ -33,6 +34,7 @@ def _write(out_dir: str, name: str, data: bytes):
 
 
 def main():
+    ensure_python_version()
     p = argparse.ArgumentParser(description="生成 SM2 密钥对")
     p.add_argument("--out", default="./keys", help="输出目录")
     args = p.parse_args()
