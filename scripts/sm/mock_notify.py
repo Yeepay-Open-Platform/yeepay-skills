@@ -26,11 +26,13 @@ try:
 except ImportError:
     requests = None
 
+from common.python_version import ensure_python_version
 from sm.crypto import load_sm2_private, load_sm2_public
 from sm.notify_crypto import encrypt_notify
 
 
 def main():
+    ensure_python_version()
     p = argparse.ArgumentParser(description="本地模拟 SM2 结果通知")
     p.add_argument("--mode", choices=["simple", "real"], default="real",
                    help="real=SM2/SM4 密文（可互打验证）；simple 仅 JSON 明文")

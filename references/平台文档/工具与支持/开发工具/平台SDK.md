@@ -26,7 +26,7 @@
 | yop-python-sdk | Python | [GitHub](https://github.com/yop-platform/yop-python-sdk) | Python 2.7+ |
 | yop-go-sdk | Go | [GitHub](https://github.com/yop-platform/yop-go-sdk) | Go 1.18+ |
 
-版本请使用各包仓库的**最新稳定版**；Java 以 [Maven Central](https://central.sonatype.com/artifact/com.yeepay.yop.sdk/yop-java-sdk) 为准。
+版本请使用各包仓库的**最新稳定版**。Java 查版本优先 [Maven Central（central.sonatype.com）](https://central.sonatype.com/artifact/com.yeepay.yop.sdk/yop-java-sdk)，或执行 `scripts/tools/resolve_java_sdk_version.py`；**勿用** `search.maven.org`（索引滞后）。解析细则见 `开始对接/SDK使用说明.md`「版本解析协议」。
 
 ## 最佳实践
 

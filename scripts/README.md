@@ -2,6 +2,21 @@
 
 本目录为联调/本地验证工具，**非生产组件**；生产交易、出款请走商户自有系统并做完整风控与审计。
 
+## 环境要求
+
+- **Python ≥ 3.10**（脚本使用 PEP 604 类型语法；`requests` 2.33+ 亦要求 3.10+）
+- 第三方依赖见 `requirements.txt`
+
+**运行任何联调脚本前，先执行环境校验：**
+
+```bash
+cd scripts
+python tools/check_python_env.py   # 检查 Python 版本与 cryptography/requests/gmssl
+pip install -r requirements.txt    # 校验失败时安装依赖
+```
+
+各 CLI 入口也会在启动时二次校验 Python 版本；`check_python_env.py` 可在低版本 Python 上运行并给出升级引导。
+
 ## 安装依赖
 
 ```bash
@@ -22,10 +37,13 @@ scripts/
 │   ├── yop_http.py          # HTTP 报文组装
 │   ├── yop_gateway.py       # 生产 yos / 沙箱 sandbox 网关
 │   ├── yop_multipart.py     # multipart 签名
-│   └── yop_payload.py         # 请求体编解码
+│   ├── yop_payload.py         # 请求体编解码
+│   └── python_version.py      # Python 版本校验（≥3.10）
 ├── tools/                # 跨算法 CLI（见 tools/README.md）
+│   ├── check_python_env.py  # 环境校验（运行任何脚本前必做）
 │   ├── verify_vectors.py    # 测试向量校验 / --regen
-│   └── verify_response.py # 离线应答验签
+│   ├── verify_response.py # 离线应答验签
+│   └── resolve_java_sdk_version.py  # yop-java-sdk 最新版（Maven Central）
 ├── rsa/                  # RSA 联调（见 rsa/README.md）
 └── sm/                   # 国密 SM2 联调（见 sm/README.md）
 ```

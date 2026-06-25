@@ -18,10 +18,12 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
+from common.python_version import ensure_python_version
 from rsa.notify_crypto import decrypt_notify, load_key
 
 
 def main():
+    ensure_python_version()
     p = argparse.ArgumentParser(description="RSA 回调密文解密验签")
     p.add_argument("--cipher", required=True, help="四段密文（可用引号包裹）")
     p.add_argument("--cipher-file", help="从文件读取密文")

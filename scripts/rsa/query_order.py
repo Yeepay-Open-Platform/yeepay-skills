@@ -25,10 +25,12 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
+from common.python_version import ensure_python_version
 from rsa import client as yop_client
 
 
 def main():
+    ensure_python_version()
     p = argparse.ArgumentParser(description="易宝查单")
     p.add_argument("--appkey", default=os.getenv("YOP_APPKEY"))
     p.add_argument("--key", default=os.getenv("YOP_PRIVATE_KEY"), help="私钥文件路径或 PEM 文本")

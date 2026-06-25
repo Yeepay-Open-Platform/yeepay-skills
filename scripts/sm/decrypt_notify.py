@@ -21,6 +21,7 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
+from common.python_version import ensure_python_version
 from sm.crypto import load_sm2_private, load_sm2_public
 from sm.notify_crypto import decrypt_notify
 
@@ -36,6 +37,7 @@ def _parse_headers(items: list[str]) -> dict:
 
 
 def main():
+    ensure_python_version()
     p = argparse.ArgumentParser(description="SM2 回调解密验签")
     p.add_argument("--header", action="append", default=[], help="请求头，可重复")
     p.add_argument("--headers-file", help="JSON 文件存放 headers")

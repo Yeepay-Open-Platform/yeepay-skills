@@ -9,18 +9,37 @@
 
 ## 二、引入依赖
 
-使用 [Maven Central](https://central.sonatype.com/artifact/com.yeepay.yop.sdk/yop-java-sdk) **最新稳定版**。
+生成 `pom.xml` / `build.gradle` 前须**实时解析**最新稳定版，禁止凭记忆或旧文档硬编码。
+
+| 方式 | 用法 |
+|------|------|
+| 浏览器（推荐） | [Maven Central · yop-java-sdk](https://central.sonatype.com/artifact/com.yeepay.yop.sdk/yop-java-sdk) 页面 Versions 列表 |
+| 命令行（推荐） | `cd scripts && python tools/resolve_java_sdk_version.py` |
+| curl | 见下方「版本解析协议」 |
+
+> **勿用** `search.maven.org` 查版本（索引滞后）。**勿用** `central.sonatype.com/solrsearch` 且不带 `sort=v desc`（会误返回 `4.2.2-jdk6on` 等旧版）。
+
+### 版本解析协议
+
+```text
+1. 命令行（优先）：cd scripts && python tools/resolve_java_sdk_version.py
+2. curl（central.sonatype.com Solr，须 sort=v desc）：
+   curl -sS 'https://central.sonatype.com/solrsearch/select?q=g:com.yeepay.yop.sdk+AND+a:yop-java-sdk&rows=1&wt=json&sort=v%20desc'
+   取 response.docs[0].v
+3. 回退：repo1.maven.org maven-metadata.xml 的 <release> 节点
+4. 软算法包（yop-java-sdk-crypto-gm / yop-java-sdk-crypto-inter）版本与主包一致
+```
 
 ```xml
 <dependency>
   <groupId>com.yeepay.yop.sdk</groupId>
   <artifactId>yop-java-sdk</artifactId>
-  <version><!-- 最新稳定版 --></version>
+  <version><!-- 按版本解析协议实时获取 --></version>
 </dependency>
 ```
 
 ```groovy
-implementation 'com.yeepay.yop.sdk:yop-java-sdk:<最新稳定版>'
+implementation 'com.yeepay.yop.sdk:yop-java-sdk:<按版本解析协议实时获取>'
 ```
 
 功能门槛：多域名路由需 SDK `4.4.1` 及以上。

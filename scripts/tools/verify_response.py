@@ -21,6 +21,7 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
+from common.python_version import ensure_python_version
 from common.response_verify import (
     HEADER_SERIAL,
     HEADER_SIGN,
@@ -53,6 +54,7 @@ def _load_headers(path: str) -> dict[str, str]:
 
 
 def main() -> int:
+    ensure_python_version()
     p = argparse.ArgumentParser(description="易宝 API 应答验签")
     p.add_argument("--algo", choices=["rsa", "sm2"], default="rsa", help="验签算法")
     p.add_argument("--body", help="响应 body 原文")

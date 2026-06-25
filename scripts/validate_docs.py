@@ -22,14 +22,19 @@ SKILL_ROOT = Path(__file__).resolve().parent.parent
 REFERENCES_ROOT = SKILL_ROOT / "references"
 PLATFORM_DOC_ROOT = REFERENCES_ROOT / "平台文档"
 SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 RSA_VECTOR_DIR = SCRIPTS_DIR / "rsa" / "tests" / "vectors"
 SM_VECTOR_DIR = SCRIPTS_DIR / "sm" / "tests" / "vectors"
 
 # 全库禁止出现的过期模式（CHANGELOG.md 作为历史记录豁免）
+from common.python_version import ensure_python_version
+
 STALE_PATTERNS = {
     "definition.json": "旧数据源，应改用 doc_md（docs-v3/api/<slug>.md）",
     "errcode.json": "旧数据源，错误码在 doc_md「错误码」章节",
     "apis/docs/apis": "旧数据源 URL，应改用 doc_md",
+    "search.maven.org/solrsearch": "已弃用索引，查 yop-java-sdk 版本请用 central.sonatype.com（见 SDK使用说明.md 版本解析协议）",
     "示例代码/后端代码": "目录已迁移至 平台文档/平台规范/安全认证/",
     "references/示例代码": "目录已删除，前端示例在产品场景 md，后端协议在 安全认证/",
 }
@@ -325,6 +330,7 @@ def run_notify_sm_roundtrip() -> list[str]:
 
 
 def main() -> int:
+    ensure_python_version()
     parser = argparse.ArgumentParser(description="Skill 发版守门")
     parser.add_argument("--with-notify-test", action="store_true", help="执行 mock/decrypt 互打")
     args = parser.parse_args()

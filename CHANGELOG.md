@@ -2,6 +2,24 @@
 
 版本规则与发版流程见 `README.md`「维护约定」。最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
 
+## 0.6.27 - 2026-06-25
+
+Python 环境要求与自动校验：
+
+- 明确 scripts 须 **Python ≥ 3.10**（`requirements.txt`、`.python-version`、`scripts/README.md`）。
+- 新增 `common/python_version.py`、`tools/check_python_env.py`（低版本可运行并引导升级）。
+- 各 CLI 入口启动时调用 `ensure_python_version()`；`SKILL.md` 要求 Agent 运行任何脚本前先执行环境校验。
+
+## 0.6.26 - 2026-06-25
+
+Java SDK 版本解析优化：
+
+- 新增 `scripts/tools/resolve_java_sdk_version.py`：优先 `central.sonatype.com` Solr（`sort=v desc`），回退 `maven-metadata.xml`。
+- `SDK使用说明.md` 新增「版本解析协议」，明确勿用 `search.maven.org` 及不带 `sort=v desc` 的 Solr 查询。
+- `SKILL.md` L2 路径补充 Java SDK 版本判定纪律；`平台SDK.md` 同步。
+- `validate_docs.py` 黑名单新增 `search.maven.org` 过期引用。
+- `回调解密协议.md`「完整示例」密文与 `notify_vector.json` 同步（RSA 第 1 段因随机填充与旧文档不同）。
+
 ## 0.6.25 - 2026-06-24
 
 面客体验与文档导航优化：

@@ -8,7 +8,7 @@ description: >-
   "APP支付"、"H5支付"、"公众号支付"、"付款码"、"扫码收款"、"聚合码"、"退款"、"分账"、"入账方"、
   "结算"、"提现"、"对账单"时，或咨询验签失败、回调收不到、查单、错误码排查、沙箱联调、上线检查等
   问题时使用此 Skill。
-version: 0.6.25
+version: 0.6.27
 ---
 
 # 易宝支付接入技能（统一入口）
@@ -61,13 +61,14 @@ version: 0.6.25
 | 新接入方案 | 支付载体、线上/线下、是否自有小程序/APP | 商户号、AppKey（方案阶段可不问） |
 | 生成接入代码/参数说明 | 已确认场景 md、环境（沙箱/生产）、语言/框架 | notifyUrl 具体地址 |
 | 联调排障 | 环境、接口名或 catalog id、完整错误码/报错原文、是否收到回调 | 订单号（查单时必要） |
-| 脚本/工具执行 | AppKey、私钥路径、商户号、业务单号等（见 `scripts/README.md`） | — |
+| 脚本/工具执行 | AppKey、私钥路径、商户号、业务单号等（见 `scripts/README.md`）；**须先通过** `python scripts/tools/check_python_env.py` | — |
 
 - 收集时用表格或编号列表，**一次不要问超过 5 个**；敏感信息提醒勿在聊天中粘贴完整私钥/卡号。
 
 ### ④ 执行前确认
 
 - 即将执行的操作包括：**curl 拉文档**、**输出完整代码**、**运行 scripts/**、**给出生产环境配置建议** 等，执行前用一句话说明将做什么。
+- 运行 `scripts/` 前须先执行 `python scripts/tools/check_python_env.py`；未通过则向用户说明须 Python ≥3.10 并安装 `scripts/requirements.txt`，**不得**继续执行其他脚本。
 - 示例：「我将根据小程序支付场景拉取统一下单在线文档并整理必填参数表，确认后继续？」
 - 涉及**生产环境**、**真实资金操作**（支付、退款、提现、分账、结算）时，**额外提示风险**：建议先沙箱、写操作需幂等与查单、生产密钥勿泄露。
 - 商户再次确认后才执行；若仅要方案不要代码，执行范围限于文档与步骤，不生成可运行密钥或调用生产。
@@ -129,6 +130,8 @@ version: 0.6.25
        实现签名/加密/回调解密 + doc_md 参数表（L3）+ scripts/ 本地验证
 ```
 
+**Java SDK 版本（L2 写代码前）**：生成依赖坐标前须实时解析 `yop-java-sdk` 最新稳定版，禁止硬编码或凭记忆。优先 `python scripts/tools/resolve_java_sdk_version.py`，或按 `SDK使用说明.md`「版本解析协议」用 [central.sonatype.com](https://central.sonatype.com/artifact/com.yeepay.yop.sdk/yop-java-sdk) / Solr（**须** `sort=v desc`）。**勿用** `search.maven.org`（索引滞后）；**勿用** 不带 `sort=v desc` 的 Solr 查询（会误返旧版如 `4.2.2-jdk6on`）。软算法包版本与主包一致。
+
 ---
 
 ## 技术执行顺序（商户已确认场景且同意继续后）
@@ -152,7 +155,7 @@ version: 0.6.25
 5. 在 `references/产品能力/api-index.yaml` 定位接口 `doc_md`（**L3 起点**）。
 6. **生成或核对接口字段/错误码前，必须执行文档加载协议（curl doc_md）**（**L3 拉取**）。
 7. 依据 doc_md 与所选 L1/L2 路径生成代码/参数表（遵守「示例代码节纪律（L3）」）。
-8. 需要本地验证时，经④确认后使用 `scripts/`（见 `scripts/README.md`）。
+8. 需要本地验证时，经④确认后**先**运行 `python scripts/tools/check_python_env.py`（Python ≥3.10 与依赖就绪）；未通过则引导用户升级 Python / `pip install -r scripts/requirements.txt`，**不得**继续执行其他脚本。通过后再使用 `scripts/`（见 `scripts/README.md`）。
 9. 按「标准输出模板」回复。
 
 ---
@@ -218,14 +221,15 @@ doc_md「示例代码」节为**自动生成的全参数模板**（含脏占位�
 
 ---
 
-## 工具脚本（本地，Python）
+## 工具脚本（本地，Python ≥3.10）
 
 | 用途 | 脚本 |
 |------|------|
+| **环境校验（运行任何脚本前必做）** | `scripts/tools/check_python_env.py` |
 | RSA 联调（密钥/查单/退款/回调/应答验签） | `scripts/rsa/`；应答验签 `scripts/common/response_verify.py` |
 | 国密 SM2（密钥/签名/回调/平台证书/应答验签） | `scripts/sm/`；跨算法工具 `scripts/tools/`（向量校验、离线应答验签） |
 
-> 运行任何脚本前须完成面客纪律 ②③④；仅用于联调，生产走商户自有系统。详见 `scripts/README.md`。
+> 运行任何脚本前须完成面客纪律 ②③④，并**先**执行 `check_python_env.py`；仅用于联调，生产走商户自有系统。详见 `scripts/README.md`。
 
 ---
 
@@ -301,6 +305,7 @@ CHANGELOG.md                   变更历史（版本以本文件 frontmatter 为
 scripts/                       Python 联调工具（仅本地，详见 scripts/README.md）
   validate_docs.py             发版守门（死链/版本一致/测试向量校验）
   common/                      跨算法共用库
+    python_version.py          Python 版本校验（≥3.10）
     response_verify.py         应答验签（RSA/SM2）
     url_encoding.py            签名一次编码 / HTTP 二次编码
     yop_headers.py             YOP 标准头
@@ -310,7 +315,7 @@ scripts/                       Python 联调工具（仅本地，详见 scripts/
     yop_multipart.py           multipart 签名
     yop_payload.py             请求体编解码
   rsa/ sm/                     RSA / 国密 SM2 密钥、客户端、查单/回调、测试向量
-  tools/                       跨算法 CLI：向量校验、离线应答验签
+  tools/                       跨算法 CLI：环境校验、向量校验、离线应答验签、Java SDK 版本查询
 references/
   troubleshooting.md           各业务域排障汇总
   平台文档/                    本地权威（约 30 篇）

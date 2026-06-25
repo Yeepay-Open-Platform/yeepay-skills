@@ -29,6 +29,7 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
+from common.python_version import ensure_python_version
 from sm import client as sm_client
 
 API_PATH = "/rest/v2.0/yop/platform/certs"
@@ -118,6 +119,7 @@ def _print_table(certs: list[dict], now: datetime) -> None:
 
 
 def main() -> int:
+    ensure_python_version()
     p = argparse.ArgumentParser(description="查询易宝平台 SM2 证书列表（V2）")
     p.add_argument("--appkey", default=os.getenv("YOP_APPKEY"), help="商户 appKey")
     p.add_argument("--key", default=os.getenv("YOP_PRIVATE_KEY"), help="商户 SM2 私钥 PEM 路径")

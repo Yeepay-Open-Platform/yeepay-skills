@@ -27,6 +27,7 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
+from common.python_version import ensure_python_version
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
@@ -55,6 +56,7 @@ def sign_simple(private_key, payload: str) -> str:
 
 
 def main():
+    ensure_python_version()
     p = argparse.ArgumentParser(
         description="本地模拟发结果通知",
         epilog="simple 模式仅打通 HTTP；验证解密实现请用 --mode real + decrypt_notify.py",

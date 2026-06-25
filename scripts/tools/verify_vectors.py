@@ -21,6 +21,7 @@ if str(_SCRIPTS_DIR) not in sys.path:
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
+from common.python_version import ensure_python_version
 from common.yop_gateway import resolve_gateway
 from common.yop_multipart import files_from_vector
 from common.response_verify import (
@@ -420,6 +421,7 @@ def verify() -> list[str]:
 
 
 def main() -> int:
+    ensure_python_version()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--regen", action="store_true", help="重新生成向量文件")
     args = parser.parse_args()

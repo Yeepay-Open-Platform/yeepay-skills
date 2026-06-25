@@ -10,7 +10,7 @@
 - 接入指导：按场景 md 输出流程、前置条件、易错点和接口定位。
 - 代码实现：按 SDK / 非 SDK 路径生成参数表或示例代码。
 - 联调排障：围绕签名、回调、查单、错误码、证书、IP 白名单等定位问题。
-- 本地验证：用 `scripts/` 下工具做签名、回调、应答验签和测试向量校验。
+- 本地验证：用 `scripts/` 下工具做签名、回调、应答验签和测试向量校验（须 **Python ≥ 3.10**，运行前先执行 `scripts/tools/check_python_env.py`）。
 
 ## 覆盖范围
 
@@ -124,6 +124,7 @@ yeepay-pay-skill/
 
 ```bash
 cd scripts
+python tools/check_python_env.py
 python validate_docs.py --with-notify-test
 ```
 
