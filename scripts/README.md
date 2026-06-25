@@ -15,7 +15,14 @@ scripts/
 ├── validate_docs.py      # Skill 发版守门（文档 + 向量 + 版本）
 ├── requirements.txt
 ├── common/               # 跨算法共享库
-│   └── response_verify.py   # API 应答验签（RSA/SM2）
+│   ├── response_verify.py   # API 应答验签（RSA/SM2）
+│   ├── url_encoding.py      # 签名一次编码 / HTTP 二次编码
+│   ├── yop_headers.py       # YOP 标准头
+│   ├── yop_content_type.py  # Content-Type 规范
+│   ├── yop_http.py          # HTTP 报文组装
+│   ├── yop_gateway.py       # 生产 yos / 沙箱 sandbox 网关
+│   ├── yop_multipart.py     # multipart 签名
+│   └── yop_payload.py         # 请求体编解码
 ├── tools/                # 跨算法 CLI（见 tools/README.md）
 │   ├── verify_vectors.py    # 测试向量校验 / --regen
 │   └── verify_response.py # 离线应答验签

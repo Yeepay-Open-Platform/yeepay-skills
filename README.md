@@ -53,30 +53,49 @@ yeepay-pay-skill/
 ├── CHANGELOG.md                      变更历史
 ├── LICENSE.md
 ├── SKILL.md                          唯一入口：面客纪律、技术执行顺序、路由、输出模板
-├── scripts/                          Python 联调工具（仅本地）
+├── scripts/                          Python 联调工具（仅本地，详见 scripts/README.md）
 │   ├── README.md
 │   ├── requirements.txt
 │   ├── validate_docs.py              发版守门：死链、版本一致、测试向量等
-│   ├── common/                       跨算法共用：YOP 标准头、URL 编码、应答验签
-│   ├── rsa/                          RSA 密钥、客户端、查单、退款、回调与测试向量
-│   ├── sm/                           国密 SM2 密钥、客户端、平台证书、回调与测试向量
-│   └── tools/                        跨算法工具：向量校验、离线应答验签
+│   ├── common/                       跨算法共用库
+│   │   ├── response_verify.py        应答验签（RSA/SM2）
+│   │   ├── url_encoding.py           签名一次编码 / HTTP 二次编码
+│   │   ├── yop_headers.py            YOP 标准头（SDK 版本、Session 等）
+│   │   ├── yop_content_type.py       Content-Type 规范
+│   │   ├── yop_http.py               HTTP 报文组装
+│   │   ├── yop_gateway.py            生产 yos / 沙箱 sandbox 网关解析
+│   │   ├── yop_multipart.py          multipart 签名
+│   │   └── yop_payload.py            请求体编解码
+│   ├── rsa/                          RSA 密钥、客户端、查单/退款、回调、测试向量
+│   ├── sm/                           国密 SM2 密钥、客户端、平台证书、回调、测试向量
+│   └── tools/                        跨算法 CLI：向量校验、离线应答验签
 └── references/
+    ├── troubleshooting.md            各业务域排障汇总
     ├── 产品能力/
     │   ├── 产品决策.md               选型、关键词、澄清模板、超范围回复
     │   ├── api-index.yaml            API catalog：doc_md / path / method / api_id
-    │   ├── 收单/                     收单场景流程、易错点、前端示例与 prePayTn 速查
+    │   ├── 收单/                     8 个场景流程 + prePayTn 唤起方式速查
     │   ├── 退款/
     │   ├── 分账/
     │   ├── 出款/
     │   └── 对账/
-    ├── 平台文档/
-    │   ├── platform-doc-manifest.yaml 平台规则导航索引（topics 定位必读文档）
-    │   ├── 接入准备/                 快速接入、应用管理、密钥管理
-    │   ├── 开始对接/                 SDK、沙箱、IP 白名单、错误码、Java SDK 报错
-    │   ├── 平台规范/                 上线检查、回调网络配置、结果通知、安全认证
-    │   └── 工具与支持/               平台 SDK、密钥工具、接入诊断、YOP-MCP、常见问题
-    └── troubleshooting.md            各业务域排障汇总
+    └── 平台文档/
+        ├── platform-doc-manifest.yaml  平台规则导航索引（topics 定位必读文档）
+        ├── 接入准备/
+        │   ├── 快速接入.md
+        │   ├── 应用管理.md
+        │   └── 密钥管理/               CFCA 证书、RSA/SM 密钥配置
+        ├── 开始对接/                   SDK、沙箱、IP 白名单、错误码、Java SDK 报错
+        ├── 平台规范/
+        │   ├── 上线前检查清单.md
+        │   ├── 回调网络配置.md
+        │   ├── 结果通知机制说明.md
+        │   ├── 结果通知查询与重发.md
+        │   └── 安全认证/               鉴权、加密、签名、回调/结果通知协议
+        └── 工具与支持/
+            ├── 常见问题.md
+            ├── 最佳实践/               文件下载等
+            └── 开发工具/               平台 SDK、密钥工具、接入诊断、YOP-MCP 等
 ```
 
 ## 文档数据源

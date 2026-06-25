@@ -299,21 +299,29 @@ doc_md「示例代码」节为**自动生成的全参数模板**（含脏占位�
 SKILL.md                       本文件，唯一入口（面客纪律 + 技术执行）
 CHANGELOG.md                   变更历史（版本以本文件 frontmatter 为唯一来源）
 scripts/                       Python 联调工具（仅本地，详见 scripts/README.md）
-  rsa/ sm/                     RSA / 国密 SM2 各自的密钥、客户端、查单、回调、测试向量
-  common/                      跨算法共用：应答验签、YOP 标准头、URL 编码等
-  tools/                       跨算法工具：测试向量校验、离线应答验签
   validate_docs.py             发版守门（死链/版本一致/测试向量校验）
+  common/                      跨算法共用库
+    response_verify.py         应答验签（RSA/SM2）
+    url_encoding.py            签名一次编码 / HTTP 二次编码
+    yop_headers.py             YOP 标准头
+    yop_content_type.py        Content-Type 规范
+    yop_http.py                HTTP 报文组装
+    yop_gateway.py             生产 yos / 沙箱 sandbox 网关
+    yop_multipart.py           multipart 签名
+    yop_payload.py             请求体编解码
+  rsa/ sm/                     RSA / 国密 SM2 密钥、客户端、查单/回调、测试向量
+  tools/                       跨算法 CLI：向量校验、离线应答验签
 references/
+  troubleshooting.md           各业务域排障汇总
   平台文档/                    本地权威（约 30 篇）
     platform-doc-manifest.yaml   平台规则导航索引（topics 定位必读文档）
-    接入准备/                  快速接入、应用管理、密钥管理(CFCA/RSA/SM)
-    开始对接/                  SDK使用说明、沙箱、IP白名单、平台错误码、Java-SDK报错
-    平台规范/                  上线检查、回调网络配置、结果通知机制/查询重发、安全认证
-      安全认证/                鉴权/加密/结果通知机制 + 请求签名协议/回调解密协议（不使用 SDK 时实现参考，含测试向量）
-    工具与支持/                平台SDK、密钥工具、接入诊断、YOP-MCP、常见问题
+    接入准备/                  快速接入、应用管理、密钥管理（CFCA/RSA/SM）
+    开始对接/                  SDK、沙箱、IP 白名单、错误码、Java SDK 报错
+    平台规范/                  上线检查、回调网络、结果通知机制/查询重发
+      安全认证/                鉴权/加密/签名/回调解密/结果通知 + 请求签名协议（含测试向量）
+    工具与支持/                常见问题、最佳实践（文件下载）、开发工具（SDK/密钥/MCP/诊断）
   产品能力/
     产品决策.md                选型、关键词、澄清模板、超范围回复
     api-index.yaml             API curl 清单（doc_md / path / method / api_id）
-    收单/ 退款/ 分账/ 出款/ 对账/   场景文档（流程+易错点+前端示例代码+引用）
-  troubleshooting.md           各业务域排障汇总
+    收单/ 退款/ 分账/ 出款/ 对账/   场景文档（流程+易错点+前端示例+引用）
 ```
