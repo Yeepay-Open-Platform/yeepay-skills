@@ -1,6 +1,6 @@
 # 易宝支付接入集成技能
 
-[![版本](https://img.shields.io/badge/version-1.0.0-blue)](./SKILL.md) [![许可证](https://img.shields.io/badge/license-专有-red)](./LICENSE.md)
+[![版本](https://img.shields.io/badge/version-1.0.0-blue)](./SKILL.md) [![许可证](https://img.shields.io/badge/license-Apache--2.0-green)](./LICENSE.md)
 
 > 面向 Coding Agent 的易宝支付（YeePay）接入、联调与排障技能。  
 > 仓库：[Yeepay-Open-Platform/yeepay-payment-integration](https://github.com/Yeepay-Open-Platform/yeepay-payment-integration) · 变更历史见 [CHANGELOG.md](./CHANGELOG.md)
@@ -193,7 +193,7 @@ yeepay-payment-integration/
 
 ## 许可证
 
-本仓库采用**专有许可证**，版权归易宝支付及其关联公司所有。内容仅用于经授权的接入评估与联调支持；未经授权不得复制、修改、再发布或用于商业分发。完整条款见 [LICENSE.md](./LICENSE.md)。
+本仓库采用 [Apache License 2.0](./LICENSE.md)。使用、修改与再分发须遵守许可证条款；易宝及相关商标归权利人所有，本许可证不授予商标使用许可。
 
 ## 相关链接
 
