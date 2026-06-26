@@ -2,7 +2,7 @@
 
 最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
 
-## 1.0.0 - 2026-06-25
+## 1.0.0 - 2026-06-26
 
 **yeepay-payment-integration** 首次公开发布。
 
