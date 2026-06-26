@@ -301,10 +301,13 @@ doc_md「示例代码」节为**自动生成的全参数模板**（含脏占位�
 
 ## 目录说明
 
+本技能包路径：`skills/yeepay-payment-integration/`（仓库 [yeepay-skills](https://github.com/Yeepay-Open-Platform/yeepay-skills) 内）。
+
 ```text
-SKILL.md                       本文件，唯一入口（面客纪律 + 技术执行）
-CHANGELOG.md                   变更历史（版本以本文件 frontmatter 为唯一来源）
-scripts/                       Python 联调工具（仅本地，详见 scripts/README.md）
+../../                           仓库根（yeepay-skills）
+  README.md / CHANGELOG.md / LICENSE.md
+SKILL.md                         本文件，唯一入口（面客纪律 + 技术执行）
+scripts/                         Python 联调工具（仅本地，详见 scripts/README.md）
   validate_docs.py             发版守门（死链/版本一致/测试向量校验）
   common/                      跨算法共用库
     python_version.py          Python 版本校验（≥3.10）

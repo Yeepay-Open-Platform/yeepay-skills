@@ -1,6 +1,6 @@
 # 变更历史
 
-版本规则与发版流程见 `README.md`「维护与发版」。最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
+版本以 `skills/yeepay-payment-integration/SKILL.md` frontmatter 为唯一来源；发版时同步 `api-index.yaml` 与 `platform-doc-manifest.yaml`。最新条目置顶，由 `skills/yeepay-payment-integration/scripts/validate_docs.py` 校验一致性。
 
 ## 1.0.0 - 2026-06-25
 

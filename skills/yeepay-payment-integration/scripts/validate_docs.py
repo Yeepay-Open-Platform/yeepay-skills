@@ -19,6 +19,7 @@ import sys
 from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = SKILL_ROOT.parent.parent
 REFERENCES_ROOT = SKILL_ROOT / "references"
 PLATFORM_DOC_ROOT = REFERENCES_ROOT / "平台文档"
 SCRIPTS_DIR = Path(__file__).resolve().parent
@@ -85,8 +86,22 @@ def check_file(path: Path) -> list[str]:
     return issues
 
 
+def _md_display_path(md: Path) -> str:
+    try:
+        return str(md.relative_to(SKILL_ROOT))
+    except ValueError:
+        return str(md.relative_to(REPO_ROOT))
+
+
 def _all_md_files() -> list[Path]:
-    files = [SKILL_ROOT / "SKILL.md", SKILL_ROOT / "README.md", SKILL_ROOT / "CHANGELOG.md"]
+    files = [
+        SKILL_ROOT / "SKILL.md",
+        REPO_ROOT / "README.md",
+        REPO_ROOT / "CHANGELOG.md",
+    ]
+    skill_readme = SKILL_ROOT / "README.md"
+    if skill_readme.exists():
+        files.append(skill_readme)
     files += sorted(REFERENCES_ROOT.rglob("*.md"))
     return [f for f in files if f.exists()]
 
@@ -97,7 +112,7 @@ def check_stale_patterns() -> list[str]:
         if md.name == "CHANGELOG.md":
             continue
         text = md.read_text(encoding="utf-8", errors="replace")
-        rel = md.relative_to(SKILL_ROOT)
+        rel = _md_display_path(md)
         for pattern, hint in STALE_PATTERNS.items():
             if pattern in text:
                 issues.append(f"{rel}: 含过期模式「{pattern}」（{hint}）")
@@ -110,7 +125,7 @@ def check_dead_links() -> list[str]:
     ref_pattern = re.compile(r"`([^`\s]+\.md)`|\]\(([^)\s]+\.md)\)")
     for md in _all_md_files():
         text = _strip_fenced_code(md.read_text(encoding="utf-8", errors="replace"))
-        rel = md.relative_to(SKILL_ROOT)
+        rel = _md_display_path(md)
         for match in ref_pattern.finditer(text):
             target = match.group(1) or match.group(2)
             if target.startswith("http"):
@@ -118,7 +133,7 @@ def check_dead_links() -> list[str]:
             if "<" in target or ">" in target:  # 模板占位路径，如 <域>/<场景>.md
                 continue
             if "/" in target:
-                bases = (md.parent, REFERENCES_ROOT, PLATFORM_DOC_ROOT, SKILL_ROOT)
+                bases = (md.parent, REFERENCES_ROOT, PLATFORM_DOC_ROOT, SKILL_ROOT, REPO_ROOT)
                 if not any((base / target).exists() for base in bases):
                     issues.append(f"{rel}: 引用不存在的文件 `{target}`")
             else:
@@ -143,7 +158,7 @@ def check_version_consistency() -> list[str]:
         m = re.search(r'^version:\s*"([\d.]+)"\s*$', path.read_text(encoding="utf-8"), re.M)
         versions[name] = m.group(1) if m else None
 
-    changelog = SKILL_ROOT / "CHANGELOG.md"
+    changelog = REPO_ROOT / "CHANGELOG.md"
     m = re.search(r"^## ([\d.]+) - ", changelog.read_text(encoding="utf-8"), re.M)
     versions["CHANGELOG.md 首条"] = m.group(1) if m else None
 
