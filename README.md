@@ -1,6 +1,6 @@
 # 易宝支付接入集成技能
 
-[![版本](https://img.shields.io/badge/version-1.0.0-blue)](./SKILL.md) [![许可证](https://img.shields.io/badge/license-Apache--2.0-green)](./LICENSE.md)
+[版本](./SKILL.md) [许可证](./LICENSE.md)
 
 > 面向 Coding Agent 的易宝支付（YeePay）接入、联调与排障技能。  
 > 仓库：[Yeepay-Open-Platform/yeepay-payment-integration](https://github.com/Yeepay-Open-Platform/yeepay-payment-integration) · 变更历史见 [CHANGELOG.md](./CHANGELOG.md)
@@ -21,24 +21,28 @@ Agent 可协助完成：
 4. 围绕签名、验签、回调、查单、错误码、证书和网络配置进行排障
 5. 使用本地工具完成签名、回调、应答验签和测试向量校验
 
-| 业务域 | 覆盖内容 |
-|--------|----------|
-| 收单 | 小程序支付、APP 支付、浏览器 H5、微信内 H5+公众号、被扫付款码、主扫独立码/聚合码、prePayTn 唤起方式 |
-| 退款 | 申请退款、退款查询、退款回调与排障 |
-| 分账 | 订单分账、余额分账、入账方相关流程 |
-| 出款 | 结算、提现 |
-| 对账 | 交易、分账、资金、结算对账 |
-| 运维排障 | 签名验签、回调验签、YOP 错误码、沙箱联调、上线检查 |
+
+| 业务域  | 覆盖内容                                                         |
+| ---- | ------------------------------------------------------------ |
+| 收单   | 小程序支付、APP 支付、浏览器 H5、微信内 H5+公众号、被扫付款码、主扫独立码/聚合码、prePayTn 唤起方式 |
+| 退款   | 申请退款、退款查询、退款回调与排障                                            |
+| 分账   | 订单分账、余额分账、入账方相关流程                                            |
+| 出款   | 结算、提现                                                        |
+| 对账   | 交易、分账、资金、结算对账                                                |
+| 运维排障 | 签名验签、回调验签、YOP 错误码、沙箱联调、上线检查                                  |
+
 
 ## 快速开始
 
 ### 前置条件
 
-| 项 | 要求 |
-|----|------|
-| [AI 工具](https://cursor.com)（如 Cursor） | 支持 Agent Skills 的桌面版 |
-| Node.js | 用于执行 `npx skills add`（推荐安装） |
-| Python | 仅在使用 `scripts/` 联调工具时需要 **≥ 3.10**（可选） |
+
+| 项                                     | 要求                                     |
+| ------------------------------------- | -------------------------------------- |
+| [AI 工具](https://cursor.com)（如 Cursor） | 支持 Agent Skills 的桌面版                   |
+| Node.js                               | 用于执行 `npx skills add`（推荐安装）            |
+| Python                                | 仅在使用 `scripts/` 联调工具时需要 **≥ 3.10**（可选） |
+
 
 ### 安装
 
@@ -119,12 +123,14 @@ pip install -r requirements.txt
 
 ### 更新与卸载
 
-| 操作 | 命令 |
-|------|------|
+
+| 操作             | 命令                                                                    |
+| -------------- | --------------------------------------------------------------------- |
 | 更新技能（`npx` 安装） | 重新执行 `npx skills add Yeepay-Open-Platform/yeepay-payment-integration` |
-| 更新技能（软连接） | 在克隆目录 `git pull`，无需重装 |
-| 卸载个人技能 | `rm ~/.cursor/skills/yeepay-payment-integration` |
-| 卸载项目技能 | `rm .cursor/skills/yeepay-payment-integration` |
+| 更新技能（软连接）      | 在克隆目录 `git pull`，无需重装                                                 |
+| 卸载个人技能         | `rm ~/.cursor/skills/yeepay-payment-integration`                      |
+| 卸载项目技能         | `rm .cursor/skills/yeepay-payment-integration`                        |
+
 
 软连接卸载仅删除链接，不删除源仓库。
 
@@ -197,29 +203,13 @@ yeepay-payment-integration/
 
 ## 相关链接
 
-| 链接 | 说明 |
-|------|------|
-| [易宝开放平台](https://open.yeepay.com) | 商户入驻、应用与密钥管理 |
-| [SKILL.md](./SKILL.md) | Agent 执行入口与完整纪律 |
-| [GitHub 仓库](https://github.com/Yeepay-Open-Platform/yeepay-payment-integration) | 源码与发版 |
-| [CHANGELOG.md](./CHANGELOG.md) | 版本变更记录 |
-| [GitHub Issues](https://github.com/Yeepay-Open-Platform/yeepay-payment-integration/issues) | 问题反馈与建议 |
 
-## 维护与发版
+| 链接                                                                                         | 说明              |
+| ------------------------------------------------------------------------------------------ | --------------- |
+| [易宝开放平台](https://open.yeepay.com)                                                          | 商户入驻、应用与密钥管理    |
+| [SKILL.md](./SKILL.md)                                                                     | Agent 执行入口与完整纪律 |
+| [GitHub 仓库](https://github.com/Yeepay-Open-Platform/yeepay-payment-integration)            | 源码与发版           |
+| [CHANGELOG.md](./CHANGELOG.md)                                                             | 版本变更记录          |
+| [GitHub Issues](https://github.com/Yeepay-Open-Platform/yeepay-payment-integration/issues) | 问题反馈与建议         |
 
-- 当前版本：**1.0.0**（发版时同步更新 README 顶部版本徽章、`SKILL.md` 及索引文件中的 `version`）。
-- `references/产品能力/api-index.yaml` 与 `references/平台文档/platform-doc-manifest.yaml` 的 `version` 发版时需同步。
-- 平台接口新增或变更：优先改 `api-index.yaml`，不要把字段表硬写进场景 md。
-- 平台规则变更：改 `references/平台文档/`，必要时同步 `scripts/` 与测试向量。
-- 产品流程或易错点变更：改 `references/产品能力/<业务域>/<场景>.md`。
-- 协议实现变更：更新脚本、测试向量和平台协议文档。
 
-发版前建议执行：
-
-```bash
-cd scripts
-python tools/check_python_env.py
-python validate_docs.py --with-notify-test
-```
-
-发版时建议打 Git tag（如 `v1.0.0`），便于使用者 `git checkout` 锁定版本。
