@@ -35,7 +35,7 @@ CENTRAL_SOLR_URL = (
 METADATA_URL = (
     "https://repo1.maven.org/maven2/com/yeepay/yop/sdk/yop-java-sdk/maven-metadata.xml"
 )
-USER_AGENT = "yop-integration-skills/resolve_java_sdk_version"
+USER_AGENT = "yeepay-payment-integration/resolve_java_sdk_version"
 
 
 def _fetch_text(url: str, timeout: float = 15.0) -> str:
