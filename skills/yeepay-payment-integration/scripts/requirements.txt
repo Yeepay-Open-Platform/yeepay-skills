@@ -1,0 +1,6 @@
+# Python >= 3.10 required（scripts 使用 PEP 604 类型语法；requests 2.33+ 亦要求 3.10+）
+# 运行前校验：python tools/check_python_env.py
+cryptography>=42.0.0
+requests>=2.31.0
+# SM2 密钥生成（SM2P256V1，基于 gmssl CryptSM2.default_ecc_table）
+gmssl>=3.2.1

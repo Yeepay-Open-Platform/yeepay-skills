@@ -1,0 +1,30 @@
+{
+  "app_key": "app_10086032562",
+  "timestamp": "2026-01-01T00:00:00Z",
+  "request_id": "00000000-0000-4000-8000-000000000001",
+  "expire_seconds": 1800,
+  "sign_random_hex": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "cases": [
+    {
+      "name": "POST Form 退款（SM2/SM3）",
+      "method": "POST",
+      "path": "/rest/v1.0/trade/refund",
+      "params": {
+        "merchantNo": "10086032562",
+        "orderId": "TEST_ORDER_20260101_001",
+        "refundRequestId": "REFUND_20260101_001",
+        "refundAmount": "0.01",
+        "description": "测试退款"
+      },
+      "json_body": null,
+      "expected": {
+        "content_sm3": "cbdec38b4b212159b5662b75daf5ad39822c4e64237b5622093ca773fe63ea24",
+        "canonical_request": "yop-auth-v3/app_10086032562/2026-01-01T00:00:00Z/1800\nPOST\n/rest/v1.0/trade/refund\n\nx-yop-appkey:app_10086032562\nx-yop-content-sm3:cbdec38b4b212159b5662b75daf5ad39822c4e64237b5622093ca773fe63ea24\nx-yop-request-id:00000000-0000-4000-8000-000000000001",
+        "authorization": "YOP-SM2-SM3 yop-auth-v3/app_10086032562/2026-01-01T00:00:00Z/1800/x-yop-appkey;x-yop-content-sm3;x-yop-request-id/x6KaE_Zhr4buCs_rtHpytRD6QNUCMwV7F7zYV7yCIiAeEiv_cjHtLRlQmqoeRtXAZkELVOuxl0Vue3Mat66tPg$SM3",
+        "body": "description=%25E6%25B5%258B%25E8%25AF%2595%25E9%2580%2580%25E6%25AC%25BE&merchantNo=10086032562&orderId=TEST_ORDER_20260101_001&refundAmount=0.01&refundRequestId=REFUND_20260101_001",
+        "url": "https://openapi.yeepay.com/yop-center/rest/v1.0/trade/refund",
+        "content_type": "application/x-www-form-urlencoded;charset=UTF-8"
+      }
+    }
+  ]
+}

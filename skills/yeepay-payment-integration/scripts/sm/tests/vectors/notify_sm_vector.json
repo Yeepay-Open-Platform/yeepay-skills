@@ -1,0 +1,16 @@
+{
+  "plaintext": "{\"orderId\":\"TEST_ORDER_20260101_001\",\"uniqueOrderNo\":\"1001202601010000000001\",\"status\":\"SUCCESS\",\"orderAmount\":\"0.01\"}",
+  "sm4_key_hex": "00112233445566778899aabbccddeeff",
+  "sm4_iv_hex": "0102030405060708090a0b0c0d0e0f10",
+  "headers": {
+    "Authorization": "YOP-SM2-SM3 yop-auth-v3/app_10086032562/2026-01-01T00:00:00Z/1800/content-length;content-type;x-yop-content-sm3;x-yop-encrypt;x-yop-request-id/FSBcJGMbnRbYjHZiXxtCsF-q-J6azHUHRM29C2ejpCVxXnSKPaBPqilswx0wDuWUZRW01d_AcrL5i9u8eZ5AKg$SM3",
+    "Content-Type": "application/json",
+    "Content-Length": "171",
+    "x-yop-appkey": "app_10086032562",
+    "x-yop-content-sm3": "2a5fa37cf14d116d981cab531b98cce5538bb695ecc07fab7ab90769f42c668c",
+    "x-yop-encrypt": "yop-encrypt-v1//SM4_CBC_PKCS5Padding/J1clP1c152U7BDxY6Ri39jyHp_JhBOyRk3DCH7z7shADK5RqkfY4BG2g1GiGPg_ml6fh0vpRPox8Yh13li0bIB86HDEBsRDvll015qu-yaOqCQ2HTfAquJdULoY7qS7HqT6TjV9fUKEEZ-6RPrFHvQ/AQIDBAUGBwgJCgsMDQ4PEA;/stream//JA",
+    "x-yop-request-id": "00000000-0000-4000-8000-000000000002"
+  },
+  "body": "7IeD99SDga-DteYk0CnTfo2UWQn6OA90y6-Ss6z_kgp0hRrUVajz7YxQREqU0NwH0hrlKft-qWcOzTJ_J4I48gKRebHm34OTTA09OzbFI4DZ7S4_OW9zrZMsLw36e3cbtUj4nm0HB7quj4IkN1TwvgQJQzmArJew6esT1yfZpmg",
+  "uri": "/notify/sm-vector"
+}

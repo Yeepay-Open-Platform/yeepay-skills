@@ -1,0 +1,5 @@
+{
+  "body": "{\n  \"state\": \"SUCCESS\",\n  \"result\": {\"orderId\": \"TEST_ORDER_20260101_001\"}\n}",
+  "signature": "uf9e-wIeD_58QhdzFkiHhNMw-ZLS5uyF1yU0wdQraLW0h16qXMsStxrse9KSCG80NPMzh9Rk_jkvqahr6T8NEw$SM3",
+  "sign_random_hex": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+}

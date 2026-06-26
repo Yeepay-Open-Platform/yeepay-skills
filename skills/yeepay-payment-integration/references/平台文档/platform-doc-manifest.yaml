@@ -1,0 +1,105 @@
+# 平台文档索引 — Skill 本地权威知识导航
+# Agent 查平台规则时优先读本目录；接口字段仍以在线 doc_md 为准。
+
+# 版本以 SKILL.md frontmatter 为准（单一来源）；本字段由发版时同步，validate_docs.py 校验一致性。
+version: "1.0.0"
+
+sections:
+  - name: 接入准备
+    docs:
+      - path: 接入准备/快速接入.md
+        title: 快速接入
+        topics: [入网, 密钥, SDK, 联调, 上线]
+      - path: 接入准备/应用管理.md
+        title: 应用管理
+        topics: [AppKey, 应用配置]
+      - path: 接入准备/密钥管理/密钥介绍.md
+        title: 密钥介绍
+        topics: [RSA, SM, 制备, 使用场景]
+        related: [接入准备/密钥管理/密钥配置(RSA).md, 接入准备/密钥管理/密钥配置(SM).md]
+      - path: 接入准备/密钥管理/密钥配置(RSA).md
+        title: 配置商户密钥（RSA）
+        topics: [控制台, 商户后台, 轮换, 验证公钥]
+      - path: 接入准备/密钥管理/密钥配置(SM).md
+        title: 配置商户密钥（SM）
+        topics: [CFCA, 控制台, 轮换]
+      - path: 接入准备/密钥管理/CFCA证书介绍.md
+        title: CFCA 证书介绍
+        topics: [CFCA, 资金出款, account, balance, 提现, 代付代发]
+        related: [接入准备/密钥管理/CFCA证书制备.md, 开始对接/配置IP白名单.md]
+      - path: 接入准备/密钥管理/CFCA证书制备.md
+        title: CFCA 证书制备
+
+  - name: 开始对接
+    docs:
+      - path: 开始对接/SDK使用说明.md
+        title: Java SDK 使用说明
+        topics: [依赖, 配置, YopClient, 回调]
+        related: [开始对接/Java-SDK报错说明.md]
+      - path: 开始对接/Java-SDK报错说明.md
+        title: Java SDK 报错与案例
+        topics: [依赖冲突, shade, 配置, 网络, 异常排查]
+      - path: 开始对接/平台错误码说明.md
+        title: 平台公共错误码
+        topics: [400xx, 99001xxx, 鉴权, 限流]
+      - path: 开始对接/沙箱环境联调测试.md
+        title: 沙箱环境联调测试
+      - path: 开始对接/配置IP白名单.md
+        title: 配置 IP 白名单
+        topics: [资金接口, 出站请求]
+
+  - name: 平台规范
+    docs:
+      - path: 平台规范/上线前检查清单.md
+        title: 上线前检查清单
+      - path: 平台规范/回调网络配置.md
+        title: 回调网络配置
+        topics: [防火墙, 出口 IP, 异步通知]
+        related: [开始对接/配置IP白名单.md]
+      - path: 平台规范/结果通知机制说明.md
+        title: 结果通知机制说明
+      - path: 平台规范/结果通知查询与重发.md
+        title: 结果通知查询与重发
+      - path: 平台规范/安全认证/鉴权认证机制(RSA).md
+        title: 鉴权认证机制（RSA）
+      - path: 平台规范/安全认证/鉴权认证机制(SM).md
+        title: 鉴权认证机制（SM）
+      - path: 平台规范/安全认证/平台商密证书.md
+        title: 平台商密证书
+        topics: [SM2, 平台证书, 轮换, certs, x-yop-sign-serial-no]
+        related: [平台规范/安全认证/结果通知(SM2).md, 平台规范/安全认证/报文加密机制(SM).md]
+      - path: 平台规范/安全认证/报文加密机制(RSA).md
+        title: 报文加密机制（RSA）
+      - path: 平台规范/安全认证/报文加密机制(SM).md
+        title: 报文加密机制（SM）
+      - path: 平台规范/安全认证/结果通知(RSA).md
+        title: 结果通知（RSA）
+      - path: 平台规范/安全认证/结果通知(SM2).md
+        title: 结果通知（SM2）
+      - path: 平台规范/安全认证/请求签名协议.md
+        title: 请求签名协议（语言中立，不使用 SDK 时实现参考）
+        topics: [Authorization, canonical request, 签名, 测试向量]
+        related: [平台规范/安全认证/鉴权认证机制(RSA).md, 平台规范/安全认证/鉴权认证机制(SM).md]
+      - path: 平台规范/安全认证/回调解密协议.md
+        title: 回调解密协议（语言中立，不使用 SDK 时实现参考）
+        topics: [四段密文, 解密, 验签, 测试向量]
+        related: [平台规范/安全认证/结果通知(RSA).md, 平台规范/安全认证/结果通知(SM2).md]
+
+  - name: 工具与支持
+    docs:
+      - path: 工具与支持/开发工具/平台SDK.md
+        title: 平台 SDK 清单
+      - path: 工具与支持/开发工具/密钥工具.md
+        title: 密钥工具
+      - path: 工具与支持/开发工具/接入诊断.md
+        title: 接入诊断
+      - path: 工具与支持/开发工具/YOP-MCP.md
+        title: YOP MCP
+      - path: 工具与支持/开发工具/结果通知工具.md
+        title: 结果通知快速对接网关
+      - path: 工具与支持/开发工具/证书转换工具.md
+        title: 证书格式及转换
+      - path: 工具与支持/最佳实践/文件下载.md
+        title: 文件下载接口处理
+      - path: 工具与支持/常见问题.md
+        title: 常见问题
