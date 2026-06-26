@@ -1,6 +1,7 @@
 # yeepay-skills
 
-[许可证](./LICENSE.md) · [变更历史](./CHANGELOG.md)
+[![许可证](https://img.shields.io/badge/license-Apache--2.0-green)](./LICENSE.md) · [变更历史](./CHANGELOG.md)
+
 
 > 易宝开放平台（YeePay）面向 Coding Agent 的 **Skills 集合仓库**（monorepo）。  
 > 对外发布：[Yeepay-Open-Platform/yeepay-skills](https://github.com/Yeepay-Open-Platform/yeepay-skills)
