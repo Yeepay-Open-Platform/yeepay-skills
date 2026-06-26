@@ -39,7 +39,7 @@ Agent 可协助完成：
 
 | 项                                     | 要求                                     |
 | ------------------------------------- | -------------------------------------- |
-| [AI 工具](https://cursor.com)（如 Cursor） | 支持 Agent Skills 的桌面版                   |
+| AI 工具 | 支持 Agent Skills 的编码 Agent 环境 |
 | Node.js                               | 用于执行 `npx skills add`（推荐安装）            |
 | Python                                | 仅在使用 `scripts/` 联调工具时需要 **≥ 3.10**（可选） |
 
@@ -77,8 +77,8 @@ git checkout v1.0.0   # 替换为目标 tag
 **个人技能（所有项目可用）：**
 
 ```bash
-mkdir -p ~/.cursor/skills
-ln -sfn "$(pwd)/skills/yeepay-payment-integration" ~/.cursor/skills/yeepay-payment-integration
+mkdir -p ~/.agents/skills
+ln -sfn "$(pwd)/skills/yeepay-payment-integration" ~/.agents/skills/yeepay-payment-integration
 ```
 
 **项目技能（随仓库共享给团队）：**
@@ -87,8 +87,8 @@ ln -sfn "$(pwd)/skills/yeepay-payment-integration" ~/.cursor/skills/yeepay-payme
 
 ```bash
 SKILL_SRC=/path/to/yeepay-skills/skills/yeepay-payment-integration
-mkdir -p .cursor/skills
-ln -sfn "$SKILL_SRC" .cursor/skills/yeepay-payment-integration
+mkdir -p .agents/skills
+ln -sfn "$SKILL_SRC" .agents/skills/yeepay-payment-integration
 ```
 
 > 软连接须指向 `skills/yeepay-payment-integration/`（技能包根目录），不要链到仓库根目录。`git pull` 后即可更新；请勿将整仓复制进业务项目以免版本漂移。
@@ -96,9 +96,9 @@ ln -sfn "$SKILL_SRC" .cursor/skills/yeepay-payment-integration
 ### 验证安装
 
 ```bash
-test -f ~/.cursor/skills/yeepay-payment-integration/SKILL.md && echo "个人技能 OK"
+test -f ~/.agents/skills/yeepay-payment-integration/SKILL.md && echo "个人技能 OK"
 # 或（项目级）
-test -f .cursor/skills/yeepay-payment-integration/SKILL.md && echo "项目技能 OK"
+test -f .agents/skills/yeepay-payment-integration/SKILL.md && echo "项目技能 OK"
 ```
 
 重启 AI 工具或打开新 Agent 会话后，在对话中提及易宝 / YOP 相关关键词，Agent 应自动匹配本技能（技能 ID：`yeepay-payment-integration`）。
@@ -128,8 +128,8 @@ pip install -r requirements.txt
 | -------------- | ---------------------------------------------------------- |
 | 更新技能（`npx` 安装） | 重新执行 `npx skills add Yeepay-Open-Platform/yeepay-skills` |
 | 更新技能（软连接）      | 在克隆目录 `git pull`，无需重装                                      |
-| 卸载个人技能         | `rm ~/.cursor/skills/yeepay-payment-integration`           |
-| 卸载项目技能         | `rm .cursor/skills/yeepay-payment-integration`             |
+| 卸载个人技能         | `rm ~/.agents/skills/yeepay-payment-integration`           |
+| 卸载项目技能         | `rm .agents/skills/yeepay-payment-integration`             |
 
 
 软连接卸载仅删除链接，不删除源仓库。
