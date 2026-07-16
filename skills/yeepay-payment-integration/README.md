@@ -1,6 +1,6 @@
 # 易宝支付接入集成技能
 
-[![版本](https://img.shields.io/badge/version-1.0.0-blue)](./SKILL.md) [![许可证](https://img.shields.io/badge/license-Apache--2.0-green)](../../LICENSE.md)
+[![版本](https://img.shields.io/badge/version-1.1.0-blue)](./SKILL.md) [![许可证](https://img.shields.io/badge/license-Apache--2.0-green)](../../LICENSE.md)
 
 > 面向 Coding Agent 的易宝支付（YeePay）接入、联调与排障技能。  
 > 技能 ID：`yeepay-payment-integration` · 所属仓库：[Yeepay-Open-Platform/yeepay-skills](https://github.com/Yeepay-Open-Platform/yeepay-skills) · 变更历史见 [CHANGELOG.md](../../CHANGELOG.md)
@@ -9,7 +9,7 @@
 
 ## 这是什么
 
-面向易宝支付**接入、联调与排障**场景的 Agent Skill。安装后，在对话中提及「接入易宝支付」「YOP」「小程序支付」「APP 支付」「退款」「分账」「提现」「对账」「验签失败」「回调收不到」等问题时，Agent 会自动加载 [SKILL.md](./SKILL.md)，按其中的面客纪律、产品决策与文档加载协议协助完成选型、接入与排障。
+面向易宝支付**接入、联调与排障**场景的 Agent Skill。安装后，在对话中提及「接入易宝支付」「YOP」「入网」「进件」「小程序支付」「APP 支付」「退款」「分账」「提现」「对账」「验签失败」「回调收不到」等问题时，Agent 会自动加载 [SKILL.md](./SKILL.md)，按其中的面客纪律、产品决策与文档加载协议协助完成选型、接入与排障。
 
 ## 能力与覆盖范围
 
@@ -23,6 +23,7 @@ Agent 可协助完成：
 
 | 业务域 | 覆盖内容 |
 | --- | --- |
+| 入网 | 服务商/平台商拓展子商户入网（进件）、入网进度与商户状态查询、商户信息与产品变更、沉默商户解冻、微信/支付宝实名认证 |
 | 收单 | 小程序支付、APP 支付、浏览器 H5、微信内 H5+公众号、被扫付款码、主扫独立码/聚合码、prePayTn 唤起方式 |
 | 退款 | 申请退款、退款查询、退款回调与排障 |
 | 分账 | 订单分账、余额分账、入账方相关流程 |
@@ -132,7 +133,7 @@ pip install -r requirements.txt
 
 ## 目录结构
 
-本技能包路径：`skills/yeepay-payment-integration/`。`CHANGELOG.md` 与 `LICENSE.md` 位于仓库根目录（`../../`）。
+本技能包路径：`skills/yeepay-payment-integration/`。[CHANGELOG.md](../../CHANGELOG.md) 与 [LICENSE.md](../../LICENSE.md) 位于仓库根目录（`../../`）。
 
 ```text
 yeepay-payment-integration/           技能包根目录（本目录）
@@ -165,6 +166,7 @@ yeepay-payment-integration/           技能包根目录（本目录）
     ├── 产品能力/
     │   ├── 产品决策.md               选型、关键词、澄清模板、超范围回复
     │   ├── api-index.yaml            API catalog：doc_md / path / method / api_id
+    │   ├── 入网/                     子商户入网与商户管理 + 实名认证（支付前置准备）
     │   ├── 收单/                     8 个场景流程 + prePayTn 唤起方式速查
     │   ├── 退款/
     │   ├── 分账/

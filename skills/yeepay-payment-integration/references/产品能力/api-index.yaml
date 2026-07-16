@@ -20,7 +20,7 @@
 #   * notify_spi 仅为索引提示；实现回调时 MUST 先 curl 接口 doc_md，从「结果通知」节取通知编码与 notify 文档 URL（以 doc_md 为准）。
 
 # 版本以 SKILL.md frontmatter 为准（单一来源）；本字段由发版时同步，validate_docs.py 校验一致性。
-version: "1.0.0"
+version: "1.1.0"
 
 url_templates:
   doc_md:     "https://open.yeepay.com/docs-v3/api/{slug}.md"                     # 主：实现/核对字段必拉（含错误码/示例代码）
@@ -198,6 +198,138 @@ payout:
     path: /rest/v1.0/account/withdraw/card/modify
     api_id: 813680ce2c464849b46cc8789aeba031
     doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_account_withdraw_card_modify.md
+
+merchant-netin:
+  - id: merchant-qual-upload
+    name: 文件上传（资质图片转存储URL）
+    method: POST
+    path: /yos/v1.0/sys/merchant/qual/upload
+    api_id: c45b9e0c3b8b47d6803af687e7d36a9d
+    doc_md: https://open.yeepay.com/docs-v3/api/options_yos_v1.0_sys_merchant_qual_upload.md   # 注意：此接口前缀为 options_（实测）
+  - id: mer-register-saas-merchant
+    name: 服务商入网-企业（服务商拓展的平台商入网同用此接口）
+    method: POST
+    path: /rest/v2.0/mer/register/saas/merchant
+    api_id: dac023730d434d61bcada629810beb99
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v2.0_mer_register_saas_merchant.md   # 注意：此接口前缀为 options_（实测）
+    notify_spi: mer.register-result   # 索引提示；以 doc_md「结果通知」节为准
+  - id: mer-register-saas-micro
+    name: 服务商入网-小微
+    method: POST
+    path: /rest/v2.0/mer/register/saas/micro
+    api_id: f96b5c3c8928459286be1e138f1b0ea6
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v2.0_mer_register_saas_micro.md   # 注意：此接口前缀为 options_（实测）
+    notify_spi: mer.register-result
+  - id: mer-register-contribute-merchant
+    name: 平台商入网-企业（直营平台商发起子商户入网）
+    method: POST
+    path: /rest/v2.0/mer/register/contribute/merchant
+    api_id: 2274fb74db9c4cba92fb9f968aeffb34
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v2.0_mer_register_contribute_merchant.md   # 注意：此接口前缀为 options_（实测）
+    notify_spi: mer.register-result
+  - id: mer-register-contribute-micro
+    name: 平台商入网-小微
+    method: POST
+    path: /rest/v2.0/mer/register/contribute/micro
+    api_id: d59ac62db0bc4b64b3d26119843a7a8b
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v2.0_mer_register_contribute_micro.md   # 注意：此接口前缀为 options_（实测）
+    notify_spi: mer.register-result
+  - id: mer-status-query
+    name: 商户状态查询
+    method: GET
+    path: /rest/v1.0/mer/status/query
+    api_id: 17b6c453c20b4a94bfbc8891cbcae3dc
+    doc_md: https://open.yeepay.com/docs-v3/api/get_rest_v1.0_mer_status_query.md
+  - id: mer-register-query
+    name: 商户入网进度查询
+    method: GET
+    path: /rest/v2.0/mer/register/query
+    api_id: dfbceb8a83704344bfa5d7d717cd9b16
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v2.0_mer_register_query.md   # 注意：此接口前缀为 options_（实测）
+  - id: mer-product-fee-query
+    name: 商户产品费率查询
+    method: GET
+    path: /rest/v2.0/mer/product/fee/query
+    api_id: 980cbcd73fcf43a18c8d69599c650cee
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v2.0_mer_product_fee_query.md   # 注意：此接口前缀为 options_（实测）
+  - id: mer-area-query
+    name: 查询经营省市区编码
+    method: POST
+    path: /rest/v1.0/mer/area/query
+    api_id: b9f4731e7dc84312b62f795e6acb0dab
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_mer_area_query.md
+  - id: mer-info-modify
+    name: 商户信息变更
+    method: POST
+    path: /rest/v1.0/mer/merchant/info/modify
+    api_id: 5fc5ab2c7a5f461f9b6ebe2b42940ac7
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_mer_merchant_info_modify.md   # 注意：此接口前缀为 options_（实测）
+  - id: mer-info-modify-query
+    name: 商户信息变更进度查询
+    method: GET
+    path: /rest/v1.0/mer/merchant/info/modify/query
+    api_id: e123bdabcf434d2bbada81f51191847f
+    doc_md: https://open.yeepay.com/docs-v3/api/get_rest_v1.0_mer_merchant_info_modify_query.md
+  - id: mer-product-fee-modify
+    name: 产品变更
+    method: POST
+    path: /rest/v2.0/mer/product/fee/modify
+    api_id: ca454b758ac24b72a309ecede8316217
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v2.0_mer_product_fee_modify.md   # 注意：此接口前缀为 options_（实测）
+  - id: mer-dispose-unfreeze
+    name: 沉默商户解冻申请（仅沉默商户，其他冻结联系运营/技术支持）
+    method: POST
+    path: /rest/v1.0/mer/merchant/dispose/unfreeze
+    api_id: 4e1c91cb4929464b861c61fed0b14139
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_mer_merchant_dispose_unfreeze.md   # 注意：此接口前缀为 options_（实测）
+  - id: mer-dispose-query
+    name: 沉默商户解冻申请进度查询
+    method: GET
+    path: /rest/v1.0/mer/merchant/dispose/query
+    api_id: 18c2c2c7d0b943669907f98e3cdcdbcc
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_mer_merchant_dispose_query.md   # 注意：此接口前缀为 options_（实测）
+  - id: mer-wechatauth-apply
+    name: 微信实名认证申请单申请
+    method: POST
+    path: /rest/v1.0/mer/merchant/wechatauth/apply
+    api_id: 2527a2b408cd49289be8a95e98b3f11c
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_mer_merchant_wechatauth_apply.md
+  - id: mer-wechatauth-cancel
+    name: 撤销微信实名认证申请单
+    method: POST
+    path: /rest/v1.0/mer/merchant/wechatauth/cancel
+    api_id: dc37590c257049fbaa1f552d70f53759
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_mer_merchant_wechatauth_cancel.md
+  - id: mer-wechatauth-query
+    name: 查询微信实名认证状态
+    method: GET
+    path: /rest/v1.0/mer/merchant/wechatauth/query
+    api_id: 7792279b130e4e79af9f5a8a7b2b2ccc
+    doc_md: https://open.yeepay.com/docs-v3/api/get_rest_v1.0_mer_merchant_wechatauth_query.md
+  - id: mer-auth-state-query
+    name: 商户授权状态查询（微信实名认证情况）
+    method: GET
+    path: /rest/v2.0/mer/auth/state/query
+    api_id: 3aeede411dc64ac281f2ada65a85c6cd
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v2.0_mer_auth_state_query.md   # 注意：此接口前缀为 options_（实测）
+  - id: mer-alipayauth-apply
+    name: 支付宝实名认证申请单申请
+    method: POST
+    path: /rest/v1.0/mer/alipayauth/apply
+    api_id: 9f2d0bcc6d74428a85371f27a1c548a0
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_mer_alipayauth_apply.md
+  - id: mer-alipayauth-cancel
+    name: 撤销支付宝实名认证
+    method: POST
+    path: /rest/v1.0/mer/alipayauth/cancel
+    api_id: 64a415ef71ac40a896b7e9fb75b34a2e
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_mer_alipayauth_cancel.md
+  - id: mer-alipayauth-query
+    name: 查询支付宝实名认证状态
+    method: POST
+    path: /rest/v1.0/mer/alipayauth/query
+    api_id: 3b011146e2be41ce9bf5d55282c3aa38
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_mer_alipayauth_query.md
 
 reconciliation:
   - id: bill-trade-day-download
