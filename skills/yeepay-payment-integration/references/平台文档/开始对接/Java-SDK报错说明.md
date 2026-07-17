@@ -85,6 +85,7 @@ static {
 
 - 指定 `-Dyop.sdk.config.env=qa` 时，须在 `classpath:config/qa/` 下存在对应配置；**勿只设 env 却不放文件**。
 - 生产/内测：**不要**误设 `yop.sdk.config.env`；若必须设，生产用 `prod`。
+- **不要配置易宝平台公钥**（`yop_public_key` 等）：Java SDK 已内置平台公钥并支持 SM2 证书自动更新；手写公钥（环境错、过期、截断）是验签失败常见原因。发现配置了该项时，优先**删除**后重试，见 `SDK使用说明.md` §三。
 
 ### 3.2 联调测试环境（≤4.3.3 常见踩坑）
 
@@ -192,7 +193,7 @@ curl -i https://openapi-h.yeepay.com/yop-center/metrics/healthcheck
 | 分类 | 日志关键词 | 排查要点 |
 | --- | --- | --- |
 | 商户私钥 | `Can't init ISV private key`、`No cert config found`、`can not find private key for appKey` | `isv_private_key` 格式、appKey 匹配、store_type |
-| 易宝公钥 | `Can't init YOP public key`、`response sign verify failure` | 环境公钥是否匹配（生产/沙箱/QA） |
+| 易宝公钥 | `Can't init YOP public key`、`response sign verify failure` | **先检查是否误配了 `yop_public_key`**（有则删除，交给 SDK 自动管理）；再核对 env/网关是否与环境一致（生产/沙箱/QA） |
 | 签名/加密 | `sign fail`、`verifySign fail`、`rsa encrypt failed`、`error happened when decrypt` | 密钥对错、算法 RSA/SM 是否与配置一致 |
 | 参数 | `parameter name: should not be empty`、`can't be null`、`Unexpected file parameter type` | addParameter / addMultiPartFile |
 | HTTP | `Unable to execute HTTP request`、`Unknown HTTP method`、`content should not be empty` | 方法、body、编码 UTF-8 |
@@ -205,7 +206,7 @@ curl -i https://openapi-h.yeepay.com/yop-center/metrics/healthcheck
 
 | 日志 | 含义 |
 | --- | --- |
-| `response sign verify failure, content:..., requestId:...` | 同步响应验签失败：易宝公钥环境错误或响应被篡改 |
+| `response sign verify failure, content:..., requestId:...` | 同步响应验签失败：优先排除误配的 `yop_public_key`；再查环境/网关是否错乱或响应被篡改 |
 | `Unexpected signature` / `Illegal format` | 回调验签：密文格式或签名段错误 |
 
 ### 6.3 `YopServiceException`（服务端/网关）
@@ -248,7 +249,7 @@ SDK 4.x 默认 v3，与 v2 主要差异：
 | 商户现象 | 优先检查 |
 | --- | --- |
 | 仅测试环境验签失败 | `yop.sdk.config.env=qa` 或 server_root 指向测试网关 |
-| 生产验签失败 | 是否误设 env；易宝公钥是否生产环境 |
+| 生产验签失败 | 是否误设 env；是否误配了 `yop_public_key`（有则删除）；网关是否指向生产 |
 | 升级 SDK 后编译失败 | 业务 SDK 是否同步下载；类名 V2 |
 | 依赖冲突 / 类找不到 | shade 包姿势；排除传递依赖 |
 | 回调解密失败 | `结果通知机制说明.md` + `结果通知(RSA).md` / `结果通知(SM2).md`；非 SDK 用 `scripts/rsa/decrypt_notify.py` 或 `scripts/sm/decrypt_notify.py` |

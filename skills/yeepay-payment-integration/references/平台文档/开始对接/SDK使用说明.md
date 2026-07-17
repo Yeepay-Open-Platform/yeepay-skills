@@ -82,6 +82,13 @@ implementation 'com.yeepay.yop.sdk:yop-java-sdk:<按版本解析协议实时获�
 }
 ```
 
+> **易宝平台公钥 / SM2 平台证书：不要手配（强烈建议）**
+>
+> - Java SDK **已内置**易宝平台公钥，并支持 **SM2 平台证书自动拉取与更新**；配置文件中 **不必**、也 **不建议** 填写 `yop_public_key`（或等价平台公钥字段）。
+> - 商户侧必配的是 **AppKey + 商户私钥**（`app_key` / `isv_private_key`）；平台侧密钥交给 SDK 管理即可。
+> - 手写/粘贴错误的平台公钥（环境搞错、过期、截断、混入沙箱值等）反而会导致验签失败、加解密异常；排障时优先检查是否误配了平台公钥，有则**删除该项**后重试。
+> - 仅当**不使用 SDK**、自研签名/验签时，才需要从控制台复制易宝公钥或按 `平台商密证书.md` 拉取 SM2 证书。
+
 自定义路径：JVM 参数 `-Dyop.sdk.config.file=file:///path/to/yop_sdk_config.json`（Tomcat/Jetty 等写入 `JAVA_OPTS`）。
 
 沙箱网关与 `withEnv("sandbox")` 见 `沙箱环境联调测试.md`。

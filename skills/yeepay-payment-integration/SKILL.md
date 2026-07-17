@@ -152,6 +152,8 @@ version: 1.1.0
 
 **Java SDK 版本（L2 写代码前）**：生成依赖坐标前须实时解析 `yop-java-sdk` 最新稳定版，禁止硬编码或凭记忆。优先 `python scripts/tools/resolve_java_sdk_version.py`，或按 `SDK使用说明.md`「版本解析协议」用 [central.sonatype.com](https://central.sonatype.com/artifact/com.yeepay.yop.sdk/yop-java-sdk) / Solr（**须** `sort=v desc`）。**勿用** `search.maven.org`（索引滞后）；**勿用** 不带 `sort=v desc` 的 Solr 查询（会误返旧版如 `4.2.2-jdk6on`）。软算法包版本与主包一致。
 
+**Java SDK 配置（L2）**：只配 AppKey + 商户私钥；**不要**让商户配置易宝平台公钥 / SM2 平台证书（SDK 已内置并自动更新，手配错误反而验签失败）。生成配置时默认不写入 `yop_public_key`；审阅已有 `yop_sdk_config*.json` 若发现该项，先**询问用户为何配置**（如历史兼容、非官方 SDK 混用等），再**建议用户自行移除**，勿直接删改对方配置。详见 `SDK使用说明.md` §三。
+
 ---
 
 

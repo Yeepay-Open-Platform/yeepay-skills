@@ -85,6 +85,8 @@ String encryptedJsonRequest = "uK2aKRPX-zD_SJObtQs8-G9XvxCOCS7UyZQk-XVEjCPVjNINs
 
 若要获取平台RSA公钥，请进入【[控制台](https://open.yeepay.com/developer-center)】->【我的应用】->【密钥配置】->【易宝公钥】，点击“查看公钥”获取。
 
+> **使用 Java SDK 时无需手动获取/配置平台公钥**（SDK 内置并自动管理）；本节面向自研加密实现。见 `开始对接/SDK使用说明.md` §三。
+
 加密过程具体可参考源码中的 [YopRsaEncryptor](https://github.com/yop-platform/yop-java-sdk/blob/develop/yop-java-sdk-crypto-inter/src/main/java/com/yeepay/yop/sdk/inter/security/encrypt/YopRsaEncryptor.java)。
 
 ### 构造请求头
