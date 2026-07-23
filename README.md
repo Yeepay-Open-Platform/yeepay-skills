@@ -55,5 +55,3 @@ yeepay-skills/                        仓库根目录
 | [GitHub 仓库](https://github.com/Yeepay-Open-Platform/yeepay-skills)            | 源码与发版        |
 | [CHANGELOG.md](./CHANGELOG.md)                                                | 版本变更记录       |
 | [GitHub Issues](https://github.com/Yeepay-Open-Platform/yeepay-skills/issues) | 问题反馈与建议      |
-
-
