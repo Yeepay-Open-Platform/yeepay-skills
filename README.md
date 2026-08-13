@@ -20,7 +20,7 @@
 
 | 技能 ID                        | 版本                                                    | 说明                                   | 文档                                                                                                                 |
 | ---------------------------- | ----------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| `yeepay-payment-integration` | [1.1.0](./skills/yeepay-payment-integration/SKILL.md) | 易宝支付接入、联调与排障（入网 / 收单 / 退款 / 分账 / 出款 / 对账） | [README](./skills/yeepay-payment-integration/README.md) · [SKILL.md](./skills/yeepay-payment-integration/SKILL.md) |
+| `yeepay-payment-integration` | [1.2.0](./skills/yeepay-payment-integration/SKILL.md) | 易宝支付接入、联调与排障（入网 / 收单 / 退款 / 分账 / 出款 / 对账 / 航旅易达机票） | [README](./skills/yeepay-payment-integration/README.md) · [SKILL.md](./skills/yeepay-payment-integration/SKILL.md) |
 
 
 ## 目录结构

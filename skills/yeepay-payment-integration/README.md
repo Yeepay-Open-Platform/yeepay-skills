@@ -1,6 +1,6 @@
 # 易宝支付接入集成技能
 
-[![版本](https://img.shields.io/badge/version-1.1.0-blue)](./SKILL.md) [![许可证](https://img.shields.io/badge/license-Apache--2.0-green)](../../LICENSE.md)
+[![版本](https://img.shields.io/badge/version-1.2.0-blue)](./SKILL.md) [![许可证](https://img.shields.io/badge/license-Apache--2.0-green)](../../LICENSE.md)
 
 > 面向 Coding Agent 的易宝支付（YeePay）接入、联调与排障技能。  
 > 技能 ID：`yeepay-payment-integration` · 所属仓库：[Yeepay-Open-Platform/yeepay-skills](https://github.com/Yeepay-Open-Platform/yeepay-skills) · 变更历史见 [CHANGELOG.md](../../CHANGELOG.md)
@@ -9,7 +9,7 @@
 
 ## 这是什么
 
-面向易宝支付**接入、联调与排障**场景的 Agent Skill。安装后，在对话中提及「接入易宝支付」「YOP」「入网」「进件」「小程序支付」「APP 支付」「退款」「分账」「提现」「对账」「验签失败」「回调收不到」等问题时，Agent 会自动加载 [SKILL.md](./SKILL.md)，按其中的面客纪律、产品决策与文档加载协议协助完成选型、接入与排障。
+面向易宝支付**接入、联调与排障**场景的 Agent Skill。安装后，在对话中提及「接入易宝支付」「YOP」「入网」「进件」「小程序支付」「APP 支付」「退款」「分账」「提现」「对账」「航旅易达」「机票接口」「验签失败」「回调收不到」等问题时，Agent 会自动加载 [SKILL.md](./SKILL.md)，按其中的面客纪律、产品决策与文档加载协议协助完成选型、接入与排障。
 
 ## 能力与覆盖范围
 
@@ -29,6 +29,7 @@ Agent 可协助完成：
 | 分账 | 订单分账、余额分账、入账方相关流程 |
 | 出款 | 结算、提现 |
 | 对账 | 交易、分账、资金、结算对账 |
+| 航旅易达（机票） | 航司 NDC2C/NDC2B/NDC2T、航司 B2B、OTA 分销、CDP 渠道的机票出票/退票/改升全流程，电子行程单、客票状态查询、政策池 |
 | 运维排障 | 签名验签、回调验签、YOP 错误码、沙箱联调、上线检查 |
 
 ## 快速开始
@@ -171,7 +172,8 @@ yeepay-payment-integration/           技能包根目录（本目录）
     │   ├── 退款/
     │   ├── 分账/
     │   ├── 出款/
-    │   └── 对账/
+    │   ├── 对账/
+    │   └── 航旅易达/                 机票场景文档（渠道决策+易错点）+ 渠道API清单
     └── 平台文档/
         ├── platform-doc-manifest.yaml  平台规则导航索引（topics 定位必读文档）
         ├── 接入准备/

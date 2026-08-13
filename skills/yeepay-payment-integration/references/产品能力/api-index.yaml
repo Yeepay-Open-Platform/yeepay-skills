@@ -20,7 +20,7 @@
 #   * notify_spi 仅为索引提示；实现回调时 MUST 先 curl 接口 doc_md，从「结果通知」节取通知编码与 notify 文档 URL（以 doc_md 为准）。
 
 # 版本以 SKILL.md frontmatter 为准（单一来源）；本字段由发版时同步，validate_docs.py 校验一致性。
-version: "1.1.0"
+version: "1.2.0"
 
 url_templates:
   doc_md:     "https://open.yeepay.com/docs-v3/api/{slug}.md"                     # 主：实现/核对字段必拉（含错误码/示例代码）
@@ -362,5 +362,163 @@ reconciliation:
     path: /yos/v1.0/settle/file/get
     api_id: eb31ff3ac03b4a78881cc0600054b257
     doc_md: https://open.yeepay.com/docs-v3/api/get_yos_v1.0_settle_file_get.md
+
+# 航旅易达（机票）：按渠道（解决方案）组织，与其他分组不同：
+#   * intro_md 指向「产品介绍」（适用场景，必读；须先于接口调用指引 curl）。
+#   * doc_md 指向渠道「接口调用指引」（docs-v3/solution/hlyd-*/<id>.md，可 curl，
+#     含接口调用顺序矩阵），不适用 docs-v3/api/<slug>.md 推导规则。
+#   * config_md 指向「渠道配置说明」（部分渠道对接前必读，可 curl）。
+#   * 接口级规格为各渠道下的 openapi.json（可 curl，含字段/错误码/示例代码），
+#     逐接口清单见 references/产品能力/航旅易达/渠道API清单.md。
+#   * 阅读顺序：intro_md →（config_md）→ doc_md → openapi.json；curl 失败时不得臆造内容。
+airline:
+  - id: air-cz-ndc2c
+    name: 南航 NDC2C
+    channel_code: AIR_CZ_NDC2C
+    solution: hlyd-nhndc
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-nhndc/12839.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-nhndc/14411.md
+  - id: air-mf-ndc2c
+    name: 厦航 NDC2C
+    channel_code: AIR_MF_NDC
+    solution: hlyd-xhndc
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-xhndc/12865.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-xhndc/14413.md
+  - id: air-sc-ndc2c
+    name: 山航 NDC2C
+    channel_code: AIR_SC_NDC
+    solution: hlyd-shndc
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-shndc/12891.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-shndc/14414.md
+  - id: air-zh-ndc2c
+    name: 深航 NDC2C
+    channel_code: AIR_ZH_NDC2C
+    solution: hlyd-shndc2c
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-shndc2c/14362.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-shndc2c/14415.md
+  - id: air-ky-ndc2c
+    name: 昆航 NDC2C
+    channel_code: AIR_KY_NDC2C
+    solution: hlyd-khndc2c
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-khndc2c/14530.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-khndc2c/14537.md
+  - id: air-ca-ndc2c
+    name: 国航 NDC2C
+    channel_code: AIR_CA_NDC2C
+    solution: hlyd-ghndc2c
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-ghndc2c/14791.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-ghndc2c/14798.md
+  - id: air-cz-ndc2b
+    name: 南航 NDC2B
+    channel_code: AIR_CZ_NDC2B
+    solution: hlyd-nhndc2b
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-nhndc2b/14228.md
+    config_md: https://open.yeepay.com/docs-v3/solution/hlyd-nhndc2b/14360.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-nhndc2b/14416.md
+  - id: air-mf-ndc2b
+    name: 厦航 NDC2B
+    channel_code: AIR_MF_NDC2B
+    solution: hlyd-xhndc2b
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-xhndc2b/13819.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-xhndc2b/14417.md
+  - id: air-mu-ndc2t
+    name: 东航 NDC2T
+    channel_code: AIR_MU_NDC2T
+    solution: hlyd-dhndc2t
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-dhndc2t/12943.md
+    config_md: https://open.yeepay.com/docs-v3/solution/hlyd-dhndc2t/12946.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-dhndc2t/14418.md
+  - id: air-zh-ndc2b
+    name: 深航 NDC2B
+    channel_code: AIR_ZH_B2B
+    solution: hlyd-shb2b
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-shb2b/14035.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-shb2b/14419.md
+  - id: air-mu-b2t
+    name: 东航 B2T
+    channel_code: AIR_MU_B2T_NEW
+    solution: hlyd-dhb2b
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-dhb2b/13216.md
+    config_md: https://open.yeepay.com/docs-v3/solution/hlyd-dhb2b/13244.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-dhb2b/14420.md
+  - id: air-mf-b2b
+    name: 厦航 B2B（高舱导入）
+    channel_code: AIR_MF_B2B
+    solution: hlyd-xhb2b
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-xhb2b/13195.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-xhb2b/14421.md
+  - id: air-cz-b2b-domestic
+    name: 南航 B2B（国内）
+    channel_code: AIR_CZ_NEW
+    solution: hlyd-nhb2b
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-nhb2b/12995.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-nhb2b/14422.md
+  - id: air-cz-b2b-international
+    name: 南航 B2B（国际）
+    channel_code: AIR_CZ_B2B
+    solution: hlyd-nhb2b
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-nhb2b/12995.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-nhb2b/14422.md
+  - id: air-hx-b2b
+    name: 港航 B2B
+    channel_code: AIR_HX_B2B
+    solution: hlyd-ghb2b
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-ghb2b/14300.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-ghb2b/14423.md
+  - id: air-cdp
+    name: CDP 渠道
+    channel_code: AIR_**_CDP_PTS
+    solution: hlyd-cdpqd
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-cdpqd/12969.md
+    config_md: https://open.yeepay.com/docs-v3/solution/hlyd-cdpqd/12972.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-cdpqd/14424.md
+  - id: air-meituan
+    name: 美团（OTA 分销）
+    channel_code: AIR_MT_PTS
+    solution: hlyd-mt
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-mt/12659.md
+    config_md: https://open.yeepay.com/docs-v3/solution/hlyd-mt/12679.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-mt/14425.md
+  - id: air-hbgj
+    name: 航班管家（OTA 分销）
+    channel_code: AIR_HBGJ_PTS
+    solution: hlyd-hbgj
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-hbgj/12683.md
+    config_md: https://open.yeepay.com/docs-v3/solution/hlyd-hbgj/12686.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-hbgj/14426.md
+  - id: air-woniu
+    name: 蜗牛/去哪儿（OTA 分销）
+    channel_code: AIR_QUNAR_PTS
+    solution: hlyd-qne
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-qne/12707.md
+    config_md: https://open.yeepay.com/docs-v3/solution/hlyd-qne/12710.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-qne/14427.md
+  - id: air-jinghang
+    name: 京杭（OTA 分销）
+    channel_code: AIR_JH_PTS
+    solution: hlyd-jh
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-jh/13021.md
+    config_md: https://open.yeepay.com/docs-v3/solution/hlyd-jh/13024.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-jh/14428.md
+  - id: air-51book
+    name: 51BOOK（OTA 分销）
+    channel_code: AIR_51BOOK_PTS
+    solution: hlyd-51book
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-51book/12755.md
+    config_md: https://open.yeepay.com/docs-v3/solution/hlyd-51book/12770.md
+    doc_md: https://open.yeepay.com/docs-v3/solution/hlyd-51book/14429.md
+  # 辅助接口与政策池（接口级 openapi.json 见 渠道API清单.md）
+  - id: air-auxiliary
+    name: 辅助接口（文件上传/电子行程单/客票状态/退改规则/行李信息）
+    channel_code: null   # 通用能力，无独立渠道编码；随所属渠道传对应 channel_code
+    solution: hlyd-tyjk
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-tyjk/13073.md
+    doc_md: null   # 无独立接口调用指引，接口见 渠道API清单.md「辅助接口」
+  - id: air-policy-pool
+    name: 政策池（政策查询/变价通知）
+    channel_code: null   # 通用能力，无独立渠道编码；随所属渠道传对应 channel_code
+    solution: hlyd-zcc
+    intro_md: https://open.yeepay.com/docs-v3/solution/hlyd-zcc/13099.md
+    doc_md: null   # 无独立接口调用指引，接口见 渠道API清单.md「政策池支持情况」
 
 # 平台级错误码见本地 references/平台文档/开始对接/平台错误码说明.md（不走 curl）
