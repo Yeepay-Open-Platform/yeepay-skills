@@ -2,6 +2,10 @@
 
 最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
 
+## 1.2.1 - 2026-08-20
+
+**yeepay-payment-integration** 更新航旅易达易错点与排障。
+
 ## 1.2.0 - 2026-08-13
 
 **yeepay-payment-integration** 新增航旅易达（机票）业务域，丰富前端排障能力。
