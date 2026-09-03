@@ -2,6 +2,10 @@
 
 最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
 
+## 1.3.0 - 2026-08-27
+
+**yeepay-payment-integration** 新增金融业务域（放款、信用卡还款、协议支付），补全退款服务矩阵（极速退款、补充卡信息退款、合单退款）。
+
 ## 1.2.1 - 2026-08-20
 
 **yeepay-payment-integration** 更新航旅易达易错点与排障。

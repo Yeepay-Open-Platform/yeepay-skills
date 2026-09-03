@@ -20,7 +20,7 @@
 #   * notify_spi 仅为索引提示；实现回调时 MUST 先 curl 接口 doc_md，从「结果通知」节取通知编码与 notify 文档 URL（以 doc_md 为准）。
 
 # 版本以 SKILL.md frontmatter 为准（单一来源）；本字段由发版时同步，validate_docs.py 校验一致性。
-version: "1.2.1"
+version: "1.3.0"
 
 url_templates:
   doc_md:     "https://open.yeepay.com/docs-v3/api/{slug}.md"                     # 主：实现/核对字段必拉（含错误码/示例代码）
@@ -102,6 +102,36 @@ refund:
     path: /rest/v1.0/trade/refund/query
     api_id: ddb05a9b714b4edba112c0eab0705b26
     doc_md: https://open.yeepay.com/docs-v3/api/get_rest_v1.0_trade_refund_query.md
+  - id: trade-refund-fast
+    name: 申请极速退款（不原路退，直接按上送卡信息打款）
+    method: POST
+    path: /rest/v1.0/trade/refund/fast
+    api_id: 95d251de694d4d8bb513748b5843822e
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_trade_refund_fast.md
+  - id: trade-refund-supply
+    name: 上送卡信息退款（需开通「补充卡信息退款」服务）
+    method: POST
+    path: /rest/v1.0/trade/refund/supply
+    api_id: 168d6a1dfa614fe3bbbcc09ba5f17e09
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_trade_refund_supply.md
+  - id: trade-refund-end
+    name: 结束退款（补充卡信息退款场景下商户主动终止）
+    method: POST
+    path: /rest/v1.0/trade/refund/end
+    api_id: 763c49be808941a48dab625f8f42eff1
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_trade_refund_end.md
+  - id: trade-refund-combine
+    name: 申请合单退款
+    method: POST
+    path: /rest/v1.0/trade/refund/combine
+    api_id: 6b0c6f17706a4def8623a0baab89c5e1
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_trade_refund_combine.md
+  - id: trade-refund-combine-query
+    name: 查询合单退款
+    method: GET
+    path: /rest/v1.0/trade/refund/combine-query
+    api_id: 17fccdd930d740fd877dae3ddeed2dc0
+    doc_md: https://open.yeepay.com/docs-v3/api/get_rest_v1.0_trade_refund_combine-query.md
 
 profit-sharing:
   - id: divide-apply
@@ -198,6 +228,199 @@ payout:
     path: /rest/v1.0/account/withdraw/card/modify
     api_id: 813680ce2c464849b46cc8789aeba031
     doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_account_withdraw_card_modify.md
+
+# 金融（放款 / 信用卡还款 / 协议支付）：
+#   * 场景 md 见 references/产品能力/金融/{放款,信用卡还款,协议支付}.md
+#   * 签约绑卡接口（frontcashier 分组）由协议支付与信用卡还款共用。
+#   * 协议支付 1.0（cnppay）与 2.0（financial）为两套接口，下单与查询须配对使用。
+#   * 退款相关接口在上方 refund 分组；交易日账单在 reconciliation 分组。
+financial:
+  # —— 放款：订单付款（单一资方对公快捷）
+  - id: financial-order-remit-request
+    name: 订单付款-付款
+    scene: [loan-single]
+    method: POST
+    path: /rest/v1.0/financial/order/remit/request
+    api_id: 44359a6f39ac431fbf0aeaddc3529000
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_financial_order_remit_request.md
+    notify_spi: financial.order-remit-result   # 索引提示；以 doc_md「结果通知」节为准
+  - id: financial-order-remit-query
+    name: 订单付款-订单查询
+    scene: [loan-single]
+    method: GET
+    path: /rest/v1.0/financial/order/remit/query
+    api_id: 6bc3aeb8f795451cae3e530296cd58d8
+    doc_md: https://open.yeepay.com/docs-v3/api/get_rest_v1.0_financial_order_remit_query.md
+  # —— 放款：联合贷（多资方对公快捷）
+  - id: financial-jointloan-request
+    name: 联合贷放款-下单
+    scene: [loan-joint]
+    method: POST
+    path: /rest/v1.0/financial/jointloan/request
+    api_id: 298ac6bbc6c74404875a5772dc0fda8d
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_financial_jointloan_request.md
+    notify_spi: financial.join.loan.result.notify   # 索引提示；以 doc_md「结果通知」节为准
+  - id: financial-jointloan-query
+    name: 联合贷放款-查询
+    scene: [loan-joint]
+    method: POST
+    path: /rest/v1.0/financial/jointloan/query
+    api_id: cf89e48644ef49c79ae5271492ee290a
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_financial_jointloan_query.md
+  # —— 放款：账单与回单（bizType: ORDER_REMIT / JOIN_LOAN）
+  - id: financial-trade-bill-download
+    name: 金融交易账单下载
+    scene: [loan-single, loan-joint]
+    method: GET
+    path: /yos/v1.0/financial/trade-bill/download
+    api_id: 2274b595441d4ab18fa3d9149525f50d
+    doc_md: https://open.yeepay.com/docs-v3/api/get_yos_v1.0_financial_trade-bill_download.md
+  - id: financial-receipt-get
+    name: 获取电子回单
+    scene: [loan-single, loan-joint]
+    method: POST
+    path: /rest/v1.0/financial/receipt/get
+    api_id: 83c14329240a44bd83ade25170f36136
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_financial_receipt_get.md
+    # rest 接口：响应 JSON 含 data（Base64）+ fileTypeSuffix，解码落盘；非 yos 文件流。协议支付 yos 回单见 trade-receipt-download。
+  # —— 签约绑卡（协议支付与信用卡还款共用）
+  - id: frontcashier-agreement-sign-request
+    name: 协议支付-签约请求（四要素）
+    scene: [sign, credit-card-repay]
+    method: POST
+    path: /rest/v1.0/frontcashier/agreement/sign/request
+    api_id: 6575637d8b5b4c91a6d606dcfa0fa66f
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_frontcashier_agreement_sign_request.md   # 注意：此接口前缀为 options_（实测）
+  - id: frontcashier-agreement-sign-confirm
+    name: 协议支付-签约确认
+    scene: [sign, credit-card-repay]
+    method: POST
+    path: /rest/v1.0/frontcashier/agreement/sign/confirm
+    api_id: 2b1ddd003b084620af965582afc9c319
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_frontcashier_agreement_sign_confirm.md   # 注意：此接口前缀为 options_（实测）
+  - id: frontcashier-agreement-sign-sms
+    name: 协议支付-签约短验重发
+    scene: [sign, credit-card-repay]
+    method: POST
+    path: /rest/v1.0/frontcashier/agreement/sign/sms
+    api_id: b03f09bbd31b48db8bda89d3bf2b2f38
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_frontcashier_agreement_sign_sms.md   # 注意：此接口前缀为 options_（实测）
+  - id: frontcashier-sign-import-card
+    name: 协议支付-存量签约（存量卡导入绑卡）
+    scene: [sign]
+    method: POST
+    path: /rest/v1.0/frontcashier/sign/import-card
+    api_id: 3feb1c3501184340818efe306450f5e7
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_frontcashier_sign_import-card.md   # 注意：此接口前缀为 options_（实测）
+  # —— 一键绑卡（网联查卡并签约；工行与非工行通知逻辑不同，见 金融/协议支付.md）
+  - id: frontcashier-bindcard-netsunion-request
+    name: 【金融版】查询本人银行卡并签约绑卡（一键绑卡）
+    scene: [sign-oneclick]
+    method: POST
+    path: /rest/v1.0/frontcashier/bindcard/netsunion/request
+    api_id: 64efbce1415e4a91a12fa4485b2cb0b8
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_frontcashier_bindcard_netsunion_request.md   # 注意：此接口前缀为 options_（实测）
+    notify_spi: frontcashier.page-sign-bind-success-notify-info   # 索引提示；含前端成功/失败通知，以 doc_md「结果通知」节为准
+  - id: frontcashier-bindcard-resendsms
+    name: 中台绑卡-短验重发
+    scene: [sign-oneclick]
+    method: POST
+    path: /rest/v2.0/frontcashier/bindcard/resendsms
+    api_id: 220110237c1e4e55981d598ad9f4e639
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v2.0_frontcashier_bindcard_resendsms.md   # 注意：此接口前缀为 options_（实测）
+  - id: frontcashier-bindcard-confirm
+    name: 中台绑卡-短验确认
+    scene: [sign-oneclick]
+    method: POST
+    path: /rest/v2.0/frontcashier/bindcard/confirm
+    api_id: 26a77193ab3c4b01a957ecc8c5e2cec8
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v2.0_frontcashier_bindcard_confirm.md   # 注意：此接口前缀为 options_（实测）
+  # —— 协议支付 1.0（cnppay 分组）：下单与查询须配对
+  - id: cnppay-agreement-pay-request
+    name: 协议支付1.0-支付
+    scene: [agreement-pay-v1]
+    method: POST
+    path: /rest/v1.0/cnppay/agreement/pay/request
+    api_id: a059d95959ad4445ba34171601b39dcf
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_cnppay_agreement_pay_request.md   # 注意：此接口前缀为 options_（实测）
+    notify_spi: cnppay.agreementpay.pay-result   # 索引提示；以 doc_md「结果通知」节为准
+  - id: cnppay-query
+    name: 协议支付1.0-订单查询
+    scene: [agreement-pay-v1]
+    method: GET
+    path: /rest/v1.0/cnppay/query
+    api_id: 25a45c65ead94352ac26f74de2ecd527
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_cnppay_query.md   # 注意：此接口前缀为 options_（实测）
+  # —— 协议支付 2.0（financial 分组）：下单与查询须配对，不可与 1.0 交叉
+  - id: financial-order-pay-request
+    name: 协议支付2.0-支付
+    scene: [agreement-pay-v2]
+    method: POST
+    path: /rest/v1.0/financial/order/pay/request
+    api_id: 8cfdd210ff4942c281e19c6faa445224
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_financial_order_pay_request.md
+    notify_spi: financial.order-pay-result   # 索引提示；另有 financial.order-divide-result（分账），以 doc_md「结果通知」节为准
+  - id: financial-order-pay-query
+    name: 协议支付2.0-支付订单查询
+    scene: [agreement-pay-v2]
+    method: GET
+    path: /rest/v1.0/financial/order/pay/query
+    api_id: 77b3708aa6244888b331cbb28ebe49a8
+    doc_md: https://open.yeepay.com/docs-v3/api/get_rest_v1.0_financial_order_pay_query.md
+  # —— 信用卡还款（封装版）
+  - id: cnppay-ccr-pay-request
+    name: 信用卡还款封装版-请求
+    scene: [credit-card-repay]
+    method: POST
+    path: /rest/v1.0/cnppay/ccr/pay/request
+    api_id: b09ea998761847dabb8a4dfcbb5ed353
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_cnppay_ccr_pay_request.md   # 注意：此接口前缀为 options_（实测）
+    # 该接口 doc_md 未列「结果通知」节；仅异步终态回调（同步终态不回调）。通知编码须以 doc_md/技术支持确认，不得臆造。
+  - id: cnppay-ccr-query
+    name: 信用卡还款订单查询
+    scene: [credit-card-repay]
+    method: GET
+    path: /rest/v1.0/cnppay/ccr/query
+    api_id: a999cb9dd46641719b686965d50c6121
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_cnppay_ccr_query.md   # 注意：此接口前缀为 options_（实测）
+  # —— 批量支付（定时批次还款/保费定时缴纳；签约关系独立于协议支付）
+  - id: frontcashier-batch-sign-request
+    name: 批量支付单笔签约-请求
+    scene: [batch-pay]
+    method: POST
+    path: /rest/v1.0/frontcashier/batch/sign/request
+    api_id: 76fe9642cc244b7f931bf05d980af233
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_frontcashier_batch_sign_request.md   # 注意：此接口前缀为 options_（实测）
+  - id: frontcashier-batch-sign-confirm
+    name: 批量支付单笔签约-确认
+    scene: [batch-pay]
+    method: POST
+    path: /rest/v1.0/frontcashier/batch/sign/confirm
+    api_id: d2be5d075f6b4a25bbad7482ae7a0af8
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_frontcashier_batch_sign_confirm.md   # 注意：此接口前缀为 options_（实测）
+  - id: cnppay-batch-pay-request
+    name: 批量支付下单
+    scene: [batch-pay]
+    method: POST
+    path: /rest/v1.0/cnppay/batch/pay/request
+    api_id: fdb114cbfd1645d99ea9f595c14ed92c
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_cnppay_batch_pay_request.md   # 注意：此接口前缀为 options_（实测）
+    notify_spi: trade.batch-pay-result   # 索引提示；另有 trade.pay-result，以 doc_md「结果通知」节为准
+  - id: trade-batch-order-query
+    name: 批量支付查询（含子单列表）
+    scene: [batch-pay]
+    method: GET
+    path: /rest/v1.0/trade/batch/order/query
+    api_id: 3ad0bffebe414141a56bd8adfdd8c20b
+    doc_md: https://open.yeepay.com/docs-v3/api/get_rest_v1.0_trade_batch_order_query.md
+  # —— 回单：协议支付等用 trade-receipt-download（yos）；放款用 financial-receipt-get（rest + Base64，见上方）
+  - id: trade-receipt-download
+    name: 交易回单下载
+    scene: [agreement-pay-v1, agreement-pay-v2, credit-card-repay]
+    method: GET
+    path: /yos/v1.0/trade/receipt/download
+    api_id: 3caf6aceb0934e2d997d9a719f7988f4
+    doc_md: https://open.yeepay.com/docs-v3/api/get_yos_v1.0_trade_receipt_download.md
 
 merchant-netin:
   - id: merchant-qual-upload
