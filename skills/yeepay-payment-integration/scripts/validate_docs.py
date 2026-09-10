@@ -7,6 +7,7 @@
   3. md 内相对引用死链
   4. 版本一致性（SKILL.md / CHANGELOG.md / 两个 yaml）
   5. 签名/回调解密测试向量（脚本实现 + 协议文档「完整示例」一致）
+  6. 排障资产（knowledge-map 结构与锚点、troubleshooting 标记与映射一致、diag 脚本清单与自测）
 """
 
 from __future__ import annotations
@@ -25,6 +26,8 @@ PLATFORM_DOC_ROOT = REFERENCES_ROOT / "平台文档"
 SCRIPTS_DIR = Path(__file__).resolve().parent
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
+DIAG_REF_DIR = REFERENCES_ROOT / "排障"
+DIAG_SCRIPTS_DIR = SCRIPTS_DIR / "diag"
 RSA_VECTOR_DIR = SCRIPTS_DIR / "rsa" / "tests" / "vectors"
 SM_VECTOR_DIR = SCRIPTS_DIR / "sm" / "tests" / "vectors"
 
@@ -168,6 +171,127 @@ def check_version_consistency() -> list[str]:
     for name, ver in versions.items():
         if ver != expected:
             issues.append(f"版本不一致：{name}={ver}，期望与 SKILL.md 一致（{expected}）")
+    return issues
+
+
+def _heading_anchor(heading: str) -> str:
+    """markdown 标题 → GitHub 风格锚点（保留中英文，去标点，空格转连字符）。"""
+    text = heading.lstrip("#").strip().lower()
+    text = re.sub(r"[^\w\u4e00-\u9fff\- ]", "", text)
+    return text.replace(" ", "-")
+
+
+def _parse_knowledge_map(text: str) -> tuple[str | None, list[dict[str, str]]]:
+    """极简解析：本文件结构固定（version + entries 列表），不引入 PyYAML 依赖。"""
+    version = None
+    m = re.search(r"^version:\s*(\S+)\s*$", text, re.M)
+    if m:
+        version = m.group(1)
+    entries: list[dict[str, str]] = []
+    current: dict[str, str] = {}
+    for raw in text.splitlines():
+        if raw.lstrip().startswith("#"):
+            continue
+        # 只剥行尾注释：# 前须有空白且不在引号内（localAnchor 的锚点自带 #，不能被切掉）
+        line = re.sub(r'\s+#(?=(?:[^"]*"[^"]*")*[^"]*$).*$', "", raw).rstrip()
+        if not line.strip():
+            continue
+        m = re.match(r"^\s*-\s+(\w+):\s*(.+)$", line)
+        if m:
+            if current:
+                entries.append(current)
+            current = {m.group(1): m.group(2).strip().strip('"')}
+            continue
+        m = re.match(r"^\s+(\w+):\s*(.+)$", line)
+        if m and current:
+            current[m.group(1)] = m.group(2).strip().strip('"')
+    if current:
+        entries.append(current)
+    return version, entries
+
+
+def check_diagnostic_assets() -> list[str]:
+    """排障资产：knowledge-map 结构与锚点、troubleshooting 标记与映射一致、diag 脚本清单。"""
+    issues: list[str] = []
+    km = DIAG_REF_DIR / "knowledge-map.yaml"
+    if not km.exists():
+        return [f"缺少 {km.relative_to(SKILL_ROOT)}"]
+
+    for name in ("diagnostic-protocol.md", "offline-l1.md"):
+        if not (DIAG_REF_DIR / name).exists():
+            issues.append(f"缺少 references/排障/{name}")
+
+    version, entries = _parse_knowledge_map(km.read_text(encoding="utf-8"))
+    if not version:
+        issues.append("knowledge-map.yaml: 缺少 version")
+    if not entries:
+        issues.append("knowledge-map.yaml: 无 entries")
+
+    # knowledgeId 是可选的：公开知识目录里查不到对应条目时留空，好过自造一个标识。
+    required = ("localAnchor", "evidenceRequired", "slots")
+    mapped: dict[str, str] = {}
+    for i, entry in enumerate(entries, 1):
+        missing = [k for k in required if k not in entry]
+        if missing:
+            issues.append(f"knowledge-map.yaml: 第 {i} 条缺少字段 {missing}")
+            continue
+        if entry["evidenceRequired"] not in ("true", "false"):
+            issues.append(
+                f"knowledge-map.yaml: {entry['localAnchor']} 的 evidenceRequired 须为 true/false"
+            )
+        kid = entry.get("knowledgeId")
+        if kid:
+            # 形状固定为 kn-<来源>-<hash>；挡住再写回 kb.* 这类自造标识
+            if not re.match(r"^kn-[a-z0-9-]+$", kid):
+                issues.append(
+                    f"knowledge-map.yaml: knowledgeId `{kid}` 不是服务端形状（kn-…），"
+                    "查不到对应条目时应留空而不是自造"
+                )
+            mapped[kid] = entry["evidenceRequired"]
+
+        target, _, anchor = entry["localAnchor"].partition("#")
+        path = SKILL_ROOT / target
+        if not path.exists():
+            issues.append(f"knowledge-map.yaml: localAnchor 指向不存在的文件 `{target}`")
+            continue
+        if anchor:
+            headings = re.findall(r"^#{1,6} .+$", path.read_text(encoding="utf-8"), re.M)
+            if anchor not in {_heading_anchor(h) for h in headings}:
+                issues.append(f"knowledge-map.yaml: `{target}` 中找不到锚点 `#{anchor}`")
+
+    # troubleshooting.md 中的标记必须登记在 map 里且 evidenceRequired 一致
+    ts_text = (REFERENCES_ROOT / "troubleshooting.md").read_text(encoding="utf-8")
+    for kid, ev in re.findall(
+        r"`knowledgeId:\s*([\w.-]+)`\s*·\s*`evidenceRequired:\s*(true|false)`", ts_text
+    ):
+        if kid not in mapped:
+            issues.append(f"troubleshooting.md: 标记 {kid} 未登记在 knowledge-map.yaml")
+        elif mapped[kid] != ev:
+            issues.append(
+                f"troubleshooting.md: {kid} 的 evidenceRequired={ev}，与 knowledge-map.yaml（{mapped[kid]}）不一致"
+            )
+
+    # scripts/diag 存在时（P1 起）：README 与脚本清单一致，且自测通过
+    if DIAG_SCRIPTS_DIR.exists():
+        readme = DIAG_SCRIPTS_DIR / "README.md"
+        if not readme.exists():
+            issues.append("scripts/diag/: 缺少 README.md")
+        else:
+            listed = readme.read_text(encoding="utf-8")
+            for script in sorted(DIAG_SCRIPTS_DIR.glob("*.py")):
+                if script.name.startswith("_"):
+                    continue
+                if script.name not in listed:
+                    issues.append(f"scripts/diag/README.md: 未收录 {script.name}")
+        selftest = DIAG_SCRIPTS_DIR / "tests" / "test_redact.py"
+        if not selftest.exists():
+            issues.append("scripts/diag/tests/test_redact.py 缺失")
+        else:
+            proc = subprocess.run(
+                [sys.executable, str(selftest)], capture_output=True, text=True,
+            )
+            if proc.returncode != 0:
+                issues.append(f"diag 自测失败：{(proc.stdout or proc.stderr).strip()}")
     return issues
 
 
@@ -356,6 +480,7 @@ def main() -> int:
     all_issues.extend(check_stale_patterns())
     all_issues.extend(check_dead_links())
     all_issues.extend(check_version_consistency())
+    all_issues.extend(check_diagnostic_assets())
     all_issues.extend(check_vectors())
 
     if args.with_notify_test:
@@ -369,7 +494,7 @@ def main() -> int:
         return 1
 
     count = len(_all_md_files())
-    print(f"发版守门通过（共检查 {count} 个 md 文件 + 版本一致性 + 测试向量）")
+    print(f"发版守门通过（共检查 {count} 个 md 文件 + 版本一致性 + 排障资产 + 测试向量）")
     return 0
 
 

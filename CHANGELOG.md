@@ -2,6 +2,10 @@
 
 最新条目置顶，首条版本号须与 `SKILL.md` frontmatter 一致（`validate_docs.py` 校验）。
 
+## 1.4.0 - 2026-09-10
+
+**yeepay-payment-integration** 正式发布远端排障通道（对接 `yop-agent`）。
+
 ## 1.3.0 - 2026-08-27
 
 **yeepay-payment-integration** 新增金融业务域（放款、信用卡还款、协议支付），补全退款服务矩阵（极速退款、补充卡信息退款、合单退款）。

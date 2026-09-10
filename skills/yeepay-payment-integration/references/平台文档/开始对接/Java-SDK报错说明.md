@@ -120,13 +120,19 @@ System.setProperty("yop.sdk.config.env", "qa");
 
 经 Nginx 转发时，SDK 配置的 root 填 Nginx 地址，由 Nginx 反代到 `openapi.yeepay.com` 等；健康检查：`curl -i http://nginx地址/sandbox/metrics/healthcheck` 应返回 200。
 
-### 3.7 关闭故障上报
+### 3.7 SDK 客户端指标上报（关闭故障上报）
 
-配置文件：
+Java SDK 除业务 API 外，还可向平台上报客户端运行指标（配置项 `yop_report`）。这类出站流量**不是**下单、查单、退款等业务调用。
+
+关闭方式——只改配置，不要为关上报去改业务代码：
 
 ```json
 "yop_report": { "enable": false }
 ```
+
+写在当前使用的 `yop_sdk_config`（或环境对应配置文件）中。关闭后不再发起该上报，**不影响**业务 API。
+
+文档未规定上报间隔、线程名或内部类名——回答时不要编这些细节，也不要把「生产必须关闭」写成平台强制要求。若客户看到周期性、与业务接口路径无关的出站流量，先核对本项是否仍为开启。
 
 ---
 

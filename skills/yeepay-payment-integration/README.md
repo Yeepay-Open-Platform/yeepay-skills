@@ -1,6 +1,6 @@
 # 易宝支付接入集成技能
 
-[![版本](https://img.shields.io/badge/version-1.3.0-blue)](./SKILL.md) [![许可证](https://img.shields.io/badge/license-Apache--2.0-green)](../../LICENSE.md)
+[![版本](https://img.shields.io/badge/version-1.4.0-blue)](./SKILL.md) [![许可证](https://img.shields.io/badge/license-Apache--2.0-green)](../../LICENSE.md)
 
 > 面向 Coding Agent 的易宝支付（YeePay）接入、联调与排障技能。  
 > 技能 ID：`yeepay-payment-integration` · 所属仓库：[Yeepay-Open-Platform/yeepay-skills](https://github.com/Yeepay-Open-Platform/yeepay-skills) · 变更历史见 [CHANGELOG.md](../../CHANGELOG.md)
@@ -20,6 +20,7 @@ Agent 可协助完成：
 3. 根据 SDK 或非 SDK 方式生成参数说明或示例代码
 4. 围绕签名、验签、回调、查单、错误码、证书和网络配置进行排障
 5. 使用本地工具完成签名、回调、应答验签和测试向量校验
+6. 按「有无平台实时数据」区分排障结论强度：未连接平台时只给自查建议，不给无证据的生产根因
 
 | 业务域 | 覆盖内容 |
 | --- | --- |
@@ -32,6 +33,7 @@ Agent 可协助完成：
 | 金融（持牌金融机构） | 放款（订单付款对公快捷、联合贷）、信用卡跨行还款、协议支付（四要素签约绑卡/一键绑卡/存量签约、协议支付 1.0 与 2.0、批量支付）、放款账单与电子回单 |
 | 航旅易达（机票） | 航司 NDC2C/NDC2B/NDC2T、航司 B2B、OTA 分销、CDP 渠道的机票出票/退票/改升全流程，电子行程单、客票状态查询、政策池 |
 | 运维排障 | 签名验签、回调验签、YOP 错误码、沙箱联调、上线检查 |
+| 实时排障（需授权） | 用 AppKey + 私钥兑换诊断凭证后，连接易宝排障服务按该商户实时事实定位并挂证据（`scripts/diag/`）。未授权时一律停在本地自查建议（L1），边界见 [references/排障/offline-l1.md](./references/排障/offline-l1.md) |
 
 ## 快速开始
 
@@ -102,6 +104,22 @@ test -f .agents/skills/yeepay-payment-integration/SKILL.md && echo "项目技能
 
 重启 AI 工具或打开新 Agent 会话后，在对话中提及易宝 / YOP 相关关键词，Agent 应自动匹配本技能（技能 ID：`yeepay-payment-integration`）。
 
+### 关于实时排障与诊断凭证
+
+本技能**无需任何凭证即可使用**：选型、接入、代码生成、错误码解释与本地自查建议全部在本地完成。
+
+需要平台实时数据才能定论的排障（如「这笔请求平台侧到底怎么失败的」「通知发过几次」），须持有**诊断凭证**：
+
+```bash
+python scripts/diag/diag_env.py --env SANDBOX          # 先自检（不外发任何数据）
+python scripts/diag/diag_auth.py --app-key app_100xxx \
+    --private-key ./keys/rsa_private_pkcs8.pem --env SANDBOX
+```
+
+用你已有的 AppKey 与商户私钥在本机兑换即可。**开放平台网页目前不能兑换诊断凭证**（「开发服务 > 接入诊断」是产品/API 开通检查，不是发 token）。不需要控制台账号；私钥只传文件路径、不出本机，RSA 与国密 SM2 都支持。凭证有效期 7 天，`--revoke` 可随时吊销。详见 [scripts/diag/README.md](./scripts/diag/README.md)。
+
+未授权时技能会明确标注「未连接平台实时数据」，只给自查建议，**不会**给出无证据的生产根因。
+
 ### 示例提问
 
 - 「我要接入易宝微信小程序支付，Java SDK，沙箱环境，帮我梳理接入步骤。」
@@ -156,6 +174,10 @@ yeepay-payment-integration/           技能包根目录（本目录）
 │   │   ├── yop_gateway.py            生产 yos / 沙箱 sandbox 网关解析
 │   │   ├── yop_multipart.py          multipart 签名
 │   │   └── yop_payload.py            请求体编解码
+│   ├── diag/                         远端排障通道（唯一，详见 diag/README.md）
+│   │   ├── diag_env.py               本地自检（不外发数据）
+│   │   ├── diag_auth.py              诊断凭证兑换 / 吊销
+│   │   └── diag_session.py           排障会话创建 / 继续 / 查询
 │   ├── tools/                        跨算法 CLI（详见 tools/README.md）
 │   │   ├── check_python_env.py       环境校验（运行任何脚本前必做）
 │   │   ├── verify_vectors.py         测试向量校验 / --regen
@@ -164,7 +186,11 @@ yeepay-payment-integration/           技能包根目录（本目录）
 │   ├── rsa/                          RSA 密钥、客户端、查单/退款、回调、测试向量
 │   └── sm/                           国密 SM2 密钥、客户端、平台证书、回调、测试向量
 └── references/
-    ├── troubleshooting.md            各业务域排障汇总
+    ├── troubleshooting.md            各业务域排障汇总（条目带 knowledgeId / evidenceRequired）
+    ├── 排障/                          排障链路边界（L1 / L2）
+    │   ├── diagnostic-protocol.md    远端交互协议（槽位闭集、脱敏、退出码、凭证与会话）
+    │   ├── knowledge-map.yaml        本地条目 ↔ 服务端知识条目映射
+    │   └── offline-l1.md             无凭证降级的可做/不可做与话术
     ├── 产品能力/
     │   ├── 产品决策.md               选型、关键词、澄清模板、超范围回复
     │   ├── api-index.yaml            API catalog：doc_md / path / method / api_id

@@ -1,0 +1,62 @@
+# 本地排障条目 ↔ 服务端已发布知识条目 映射
+#
+# knowledgeId 对齐服务端响应中的 knowledgeId 字段（不是 playbookId），形如 kn-docs-<hash>。
+# 取值必须能在服务端公开知识目录里查到，核对方式：
+#     python scripts/diag/diag_knowledge.py verify-map
+# 公开目录里没有对应条目时**留空**（`knowledgeId:` 不写值），不得自造标识。
+#
+# 用途（仅三条，别扩）：
+#   1. 离线态（无诊断凭证）按 evidenceRequired 决定结论强度：
+#      true  → 只给自查建议，输出必须带「需平台实时数据确认」标记；
+#      false → 知识指导类，离线态即为最终答案，不劝用户去授权。
+#   2. 离线态按 slots 提示用户准备哪些信息（兜底清单）。
+#   3. 有凭证时按 evidenceRequired 决定要不要上远端：false 的条目本地答完就收，
+#      不调 L2（省一次几十秒的远端调用，也少发一次商户数据）；true 的条目先给
+#      本地自查建议，需要该商户实时事实时再升 L2。
+#
+# 有诊断凭证时：槽位一律以服务端 needInfos 为准（一次性问全），本地 slots 不再使用。
+# 注意第 3 条只管「要不要上远端」，不管「问哪些槽位」——决定上远端后，首轮直接
+# 把用户原话发出去，缺什么由服务端点名，不在本地按 slots 先猜着问一轮。
+#
+# slots 字段名与服务端槽位同名（见 diagnostic-protocol.md 第四节）。
+# environment 是会话级参数（2026-08-31 起）：离线态用来区分沙箱/生产自查建议；
+# 有凭证时写入请求文件，不按 --env 自动补。
+# 未能对齐服务端条目的本地内容不登记在此，也不得伪造 knowledgeId。
+#
+# version：本文件的结构与内容版本，与 SKILL.md 的技能版本无关。
+version: 1
+
+entries:
+  # 公开知识目录中无「错误码定位」条目，knowledgeId 留空
+  - localAnchor: "references/troubleshooting.md#一错误码两层定位"
+    evidenceRequired: false
+    slots: [environment, errorCode, apiUri]
+
+  - localAnchor: "references/troubleshooting.md#三签名验签失败"
+    # 无SDK使用RSA直连时验签失败/请求超时/参数错误的排查方法
+    knowledgeId: "kn-docs-c5151a31c8ec42a0"
+    evidenceRequired: true
+    slots: [environment, errorCode, requestId]
+
+  - localAnchor: "references/troubleshooting.md#二回调问题排查"
+    # 控制台查询结果通知订单、重发通知、查看发送记录；服务端「回调未收到」场景返回的即是此条
+    knowledgeId: "kn-docs-78a9fc48deabe08d"
+    evidenceRequired: true
+    slots: [merchantNo, orderId, notifyOrderId, startTime, endTime]
+
+  # 公开知识目录中无「应用标识不正确」条目，knowledgeId 留空
+  - localAnchor: "references/平台文档/开始对接/平台错误码说明.md"
+    evidenceRequired: false
+    slots: [environment]
+
+  - localAnchor: "references/平台文档/开始对接/Java-SDK报错说明.md#37-sdk-客户端指标上报关闭故障上报"
+    evidenceRequired: false
+    slots: [environment]
+
+  - localAnchor: "references/troubleshooting.md#十一java-sdk-客户端上报流量"
+    evidenceRequired: false
+    slots: [environment]
+
+  - localAnchor: "references/troubleshooting.md#十二错误码不跨体系"
+    evidenceRequired: false
+    slots: [errorCode]
