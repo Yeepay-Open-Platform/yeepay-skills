@@ -1,6 +1,6 @@
 # 易宝支付接入集成技能
 
-[![版本](https://img.shields.io/badge/version-1.4.0-blue)](./SKILL.md) [![许可证](https://img.shields.io/badge/license-Apache--2.0-green)](../../LICENSE.md)
+[![版本](https://img.shields.io/badge/version-1.5.0-blue)](./SKILL.md) [![许可证](https://img.shields.io/badge/license-Apache--2.0-green)](../../LICENSE.md)
 
 > 面向 Coding Agent 的易宝支付（YeePay）接入、联调与排障技能。  
 > 技能 ID：`yeepay-payment-integration` · 所属仓库：[Yeepay-Open-Platform/yeepay-skills](https://github.com/Yeepay-Open-Platform/yeepay-skills) · 变更历史见 [CHANGELOG.md](../../CHANGELOG.md)
@@ -25,11 +25,12 @@ Agent 可协助完成：
 | 业务域 | 覆盖内容 |
 | --- | --- |
 | 入网 | 服务商/平台商拓展子商户入网（进件）、入网进度与商户状态查询、商户信息与产品变更、沉默商户解冻、微信/支付宝实名认证 |
-| 收单 | 小程序支付、APP 支付、浏览器 H5、微信内 H5+公众号、被扫付款码、主扫独立码/聚合码、prePayTn 唤起方式 |
+| 收单 | 小程序支付、APP 支付、浏览器 H5、微信内 H5+公众号、被扫付款码、主扫独立码/聚合码、收银台（PC/H5 托管收银台）、银行转账支付（动态账号/动态附言）、prePayTn 唤起方式 |
 | 退款 | 原路退款、极速退款、补充卡信息退款、合单退款、退款查询、退款回调与排障 |
 | 分账 | 订单分账、余额分账、入账方相关流程 |
 | 出款 | 结算、提现 |
 | 对账 | 交易、分账、资金、结算对账 |
+| 氢钱包（记账簿） | 记账簿开立与变更、银行转账预收款（来账通知、来账流水查询）、记账簿支付与退款、余额查询与冻结/解冻 |
 | 金融（持牌金融机构） | 放款（订单付款对公快捷、联合贷）、信用卡跨行还款、协议支付（四要素签约绑卡/一键绑卡/存量签约、协议支付 1.0 与 2.0、批量支付）、放款账单与电子回单 |
 | 航旅易达（机票） | 航司 NDC2C/NDC2B/NDC2T、航司 B2B、OTA 分销、CDP 渠道的机票出票/退票/改升全流程，电子行程单、客票状态查询、政策池 |
 | 运维排障 | 签名验签、回调验签、YOP 错误码、沙箱联调、上线检查 |
@@ -195,11 +196,12 @@ yeepay-payment-integration/           技能包根目录（本目录）
     │   ├── 产品决策.md               选型、关键词、澄清模板、超范围回复
     │   ├── api-index.yaml            API catalog：doc_md / path / method / api_id
     │   ├── 入网/                     子商户入网与商户管理 + 实名认证（支付前置准备）
-    │   ├── 收单/                     8 个场景流程 + prePayTn 唤起方式速查
+    │   ├── 收单/                     10 个场景流程（含收银台、银行转账支付）+ prePayTn 唤起方式速查
     │   ├── 退款/
     │   ├── 分账/
     │   ├── 出款/
     │   ├── 对账/
+    │   ├── 氢钱包/                   记账簿（开立→银行转账收款→记账簿支付）
     │   ├── 金融/                     放款、信用卡还款、协议支付 + 一键绑卡支持银行速查
     │   └── 航旅易达/                 机票场景文档（渠道决策+易错点）+ 渠道API清单
     └── 平台文档/

@@ -20,7 +20,7 @@
 #   * notify_spi 仅为索引提示；实现回调时 MUST 先 curl 接口 doc_md，从「结果通知」节取通知编码与 notify 文档 URL（以 doc_md 为准）。
 
 # 版本以 SKILL.md frontmatter 为准（单一来源）；本字段由发版时同步，validate_docs.py 校验一致性。
-version: "1.4.0"
+version: "1.5.0"
 
 url_templates:
   doc_md:     "https://open.yeepay.com/docs-v3/api/{slug}.md"                     # 主：实现/核对字段必拉（含错误码/示例代码）
@@ -67,6 +67,29 @@ acquiring:
     api_id: b49db74dd1fe4099836cf9e7b5d114d1
     doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_aggpay_pay-link.md
     notify_spi: trade.pay-result
+  - id: cashier-unified-order
+    name: 收银台统一下单（返回 cashierUrl，PC/H5 托管收银台）
+    scene: [cashier-pc, cashier-h5]
+    method: POST
+    path: /rest/v1.0/cashier/unified/order
+    api_id: 0a0e2a29f0554b2693aaa0b73b332028
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_cashier_unified_order.md
+    notify_spi: trade.pay-result
+  - id: bank-transfer-pay
+    name: 银行转账支付（下单返回收款账号/附言等转账收款信息）
+    scene: [bank-transfer]
+    method: POST
+    path: /rest/v1.1/frontcashier/bank-transfer/pay
+    api_id: e82f4da861f0470fbececac9a496a7f3
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.1_frontcashier_bank-transfer_pay.md
+    notify_spi: trade.pay-result   # doc_md「结果通知」节另列 trade.liquidation-result（清算结果通知）
+  - id: bank-transfer-query
+    name: 银行转账查询（按商户订单号查询收款方信息）
+    scene: [bank-transfer]
+    method: GET
+    path: /rest/v1.0/frontcashier/bank-transfer/query
+    api_id: 7167e0b4b0bf41e7a1a8ba23b5b5e0cc
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_frontcashier_bank-transfer_query.md   # 注意：此接口前缀为 options_（实测）
   - id: aggpay-wechat-config-add
     name: 公众号配置接口（异步）
     scene: [miniapp, h5-browser, wechat-h5-mp, native-qr, app]
@@ -234,6 +257,84 @@ payout:
 #   * 签约绑卡接口（frontcashier 分组）由协议支付与信用卡还款共用。
 #   * 协议支付 1.0（cnppay）与 2.0（financial）为两套接口，下单与查询须配对使用。
 #   * 退款相关接口在上方 refund 分组；交易日账单在 reconciliation 分组。
+# 氢钱包（记账簿）：为 B2B 平台提供「买家记账簿 → 银行转账汇入 → 记账簿扣款」的资金管理能力。
+#   * 记账簿收款无接口（付款方从银行汇入），来账通知需联系易宝配置回调地址。
+#   * 本组接口虽在 account 分组，但 doc_md「安全需求」为 RSA/SM2，**不需要** CFCA 证书；
+#     需要 CFCA 的是提现/转账/企业账户支付等出款类接口。
+hydrogen-wallet:
+  - id: accountbook-open
+    name: 开立记账簿
+    method: POST
+    path: /rest/v2.0/account/account-manage/account/open
+    api_id: 3fa0d6fd726741318ce39699c54503b8
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v2.0_account_account-manage_account_open.md
+  - id: accountbook-query
+    name: 查询记账簿（余额）
+    method: GET
+    path: /rest/v1.0/account/account-manage/account/query
+    api_id: 1645683afba342d3aa51ad55ea33e43d
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_account_account-manage_account_query.md   # 注意：此接口前缀为 options_（实测）
+  - id: accountbook-modify
+    name: 更新记账簿
+    method: POST
+    path: /rest/v1.0/account/account-manage/account/modify
+    api_id: 32986f159d164325bb3fb252c86048ae
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_account_account-manage_account_modify.md
+  - id: accountbook-recharge-query
+    name: 批量查询记账簿来账流水
+    method: GET
+    path: /rest/v1.0/account/recharge/account-book/query
+    api_id: 3ad317bd32664790941ef99ea4bf2fe6
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_account_recharge_account-book_query.md   # 注意：此接口前缀为 options_（实测）
+  # 记账簿来账通知：无 docs-v3/notify SPI 文档，通知说明在产品页（可 curl）；回调地址需联系易宝配置
+  - id: accountbook-inbound-notify
+    name: 充值/记账簿收款结果通知（来账通知）
+    doc_md: https://open.yeepay.com/docs-v3/product/fwssfk/2263.md
+  - id: accountbook-pay
+    name: 记账簿支付（记账簿扣款至商户收单账户）
+    method: POST
+    path: /rest/v1.0/account/enterprise/account-book-pay/order
+    api_id: 0744693e959c40b89bd818e1c892cee0
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_account_enterprise_account-book-pay_order.md   # 注意：此接口前缀为 options_（实测）
+    notify_spi: trade.pay-result   # 索引提示；doc_md 未列「结果通知」节，产品页指向「支付结果通知」https://open.yeepay.com/docs-v3/product/fwssfk/2083.md
+  - id: accountbook-refund
+    name: 记账簿退款
+    method: POST
+    path: /rest/v1.0/account/account-book/refund
+    api_id: 7a2998a85c5544d09e41c60254ecd749
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_account_account-book_refund.md   # 注意：此接口前缀为 options_（实测）
+    notify_spi: account.accountbook-refund-notify
+  - id: accountbook-refund-query
+    name: 记账簿退款查询
+    method: GET
+    path: /rest/v1.0/account/account-book/query-refund
+    api_id: 0b8b1e624855428585818083fcf360f8
+    doc_md: https://open.yeepay.com/docs-v3/api/options_rest_v1.0_account_account-book_query-refund.md   # 注意：此接口前缀为 options_（实测）
+  - id: accountbook-balance-freeze
+    name: 冻结记账簿金额
+    method: POST
+    path: /rest/v1.0/account/account-manage/balance/freeze
+    api_id: e71405c5db2943acaab0dbc2975a1e4a
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_account_account-manage_balance_freeze.md
+  - id: accountbook-balance-unfreeze
+    name: 解冻记账簿金额
+    method: POST
+    path: /rest/v1.0/account/account-manage/balance/unfreeze
+    api_id: 09664f49810f4d0cb9b881d814a46456
+    doc_md: https://open.yeepay.com/docs-v3/api/post_rest_v1.0_account_account-manage_balance_unfreeze.md
+  - id: accountbook-freeze-query
+    name: 记账簿冻结记录查询
+    method: GET
+    path: /rest/v1.0/account/account-manage/balance/freeze-query
+    api_id: f395bf1d826346ea93da473d09e1fb54
+    doc_md: https://open.yeepay.com/docs-v3/api/get_rest_v1.0_account_account-manage_balance_freeze-query.md
+  - id: accountbook-unfreeze-query
+    name: 记账簿解冻记录查询
+    method: GET
+    path: /rest/v1.0/account/account-manage/balance/un-freeze-query
+    api_id: 609bc600f9684416beddb042a18f12ed
+    doc_md: https://open.yeepay.com/docs-v3/api/get_rest_v1.0_account_account-manage_balance_un-freeze-query.md
+
 financial:
   # —— 放款：订单付款（单一资方对公快捷）
   - id: financial-order-remit-request
